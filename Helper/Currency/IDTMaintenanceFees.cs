@@ -34,7 +34,7 @@ namespace GyIMS.Helper.Currency
 
         public void Query()
         {
-            _IMaintenanceFeeDal.GetModels(u => u.MaintenanceID == _MaintenanceFee.ID).ToList();
+            _IMaintenanceFeeDal.GetModels(u => u.MaintenanceID == _MaintenanceFee.MaintenanceID).ToList();
             
         }
 

@@ -25,16 +25,13 @@ namespace GyIMS.Controllers
         {
             var pageSize = Request["rows"] == "" ? 10 : int.Parse(Request["rows"]);
             var pageNumber = Request["page"] == "" ? 1 : int.Parse(Request["page"]);
-            string MaintenanceID = string.Empty;
-            if (Request["Name"] != "")
-            {
-                MaintenanceID = Request["Name"];
-            }
+            string Name = Request["Name"];
+            
             IQueryable<MaintenanceLog> maintenances;
-            if (!string.IsNullOrEmpty(MaintenanceID))
+            if (!string.IsNullOrEmpty(Name))
             {
                 maintenances = _IMaintenanceLogDal.GetModelsByPage(
-                    pageSize, pageNumber, true, u => u.ID, u => u.MaintenanceID.Contains(MaintenanceID)).OrderBy(u=>u.MaintenanceID);
+                    pageSize, pageNumber, true, u => u.ID, u => u.Name.Contains(Name)).OrderBy(u => u.MaintenanceID);
             }
             else
             {
@@ -51,17 +48,14 @@ namespace GyIMS.Controllers
         {
             var pageSize = string.IsNullOrEmpty(Request["rows"]) ? 10 : int.Parse(Request["rows"]);
             var pageNumber = string.IsNullOrEmpty(Request["page"]) ? 1 : int.Parse(Request["page"]);
-            string MaintenanceID = string.Empty;
-            if (Request["Name"] != "")
-            {
-                MaintenanceID = Request["Name"];
-            }
+            string Name = Request["Name"];
+           
 
             IQueryable<MaintenanceLog> maintenances;
-            if (!string.IsNullOrEmpty(MaintenanceID))
+            if (!string.IsNullOrEmpty(Name))
             {
                 maintenances = _IMaintenanceLogDal.GetModelsByPage(
-                    pageSize, pageNumber, true, u => u.ID, u => u.MaintenanceID.Contains(MaintenanceID)).OrderBy(u => u.MaintenanceID);
+                    pageSize, pageNumber, true, u => u.ID, u => u.Name.Contains(Name)).OrderBy(u => u.MaintenanceID);
             }
             else
             {
@@ -79,7 +73,7 @@ namespace GyIMS.Controllers
         #region 条件查找
 
         // GET: /MaintenanceLogs/
-        public ActionResult Search(string maintenance)
+        public ActionResult Search(int maintenance)
         {
             List<MaintenanceLog> maintenanceLogs = db.MaintenanceLogs.Where(item => item.MaintenanceID == maintenance).ToList();
             return View("Index", maintenanceLogs);

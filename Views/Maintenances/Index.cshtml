@@ -9,8 +9,14 @@
 <div>
 
     <div id="dg-search" margin="0,30,0,30">
-        <label for="Name">运维单号：</label>
+        <label for="Name">运维申请单号：</label>
         <input id="Name" class="easyui-validatebox" data-options="width:200" />
+
+        <label for="CreateDateStart">创建日期起：</label>
+        <input type="text" id="CreateDateStart" class="easyui-datebox" data-options="width:200" />
+
+        <label for="CreateDateEnd">创建日期止：</label>
+        <input type="text" id="CreateDateEnd" class="easyui-datebox" data-options="width:200" />
     </div>
 
     <table id="dg"></table>
@@ -23,13 +29,23 @@
         <a href="javascript:void(0)" class="easyui-linkbutton" data-options="iconCls:'icon-man' " onclick="Apply()">申请</a>
         <a href="javascript:void(0)" class="easyui-linkbutton" data-options="iconCls:'icon-cancel' " onclick="Cancel()">作废</a>
         <a href="javascript:void(0)" class="easyui-linkbutton" data-options="iconCls:'icon-remove'" onclick="Delete()">删除</a>
+
+        <input type="file" id="Import" name="Import" title="导入文件" />
+        <a href="#" class="easyui-linkbutton" data-options="iconCls:'icon-blank'" onclick="Import()">
+            导入
+        </a>
+        <a href="@Url.Action("FileDownload","Maintenances",new { filename = "Content/Template/运维单信息.xlsx"})">下载导入模板</a>
         @*<a href="#" class="easyui-linkbutton" data-options="iconCls:'icon-blank'" onclick="Export()">导出</a>*@
     </div>
 
 </div>
 
-@*脚本*@
-<script>
+@*脚本*@  
+@section scripts{
+
+@Scripts.Render("~/Scripts/fileUpload.js")
+
+<script type="text/javascript">
 
     $(function () {
         $("#dg").datagrid({
@@ -38,7 +54,7 @@
             queryParams: "",
             columns: [[
                  { field: 'ID', title: '运维单号', width: 150, align: 'center' },
-                 { field: 'Applier', title: '申请人', width: 150, align: 'center' }, 
+                 { field: 'Applier', title: '申请人', width: 150, align: 'center' },
                  { field: 'Region', title: '区域（申请人所在）', width: 150, align: 'center',formatter: getstatusnobyid },
                  { field: 'Type', title: '问题类型', width: 100, align: 'center', formatter: getstatusnobyid },
                  { field: 'Name', title: '问题名称', width: 150, align: 'center' },
@@ -65,7 +81,7 @@
             pageSize: 10,
             pageList: [10, 20, 30],
             method: 'get',
-            onClickRow: function (rowIndex, rowData) {
+            onDblClickRow: function (rowIndex, rowData) {
                 openNewWindow("@Url.Action("Details", "Maintenances", new { area = "" })/" + rowData.ID, "newwindow",800,500);
             }
         });
@@ -85,12 +101,16 @@
         var row = $('#dg').datagrid('getSelected');
         if (row != null) {
 
-            window.location.href = "/Maintenances/Edit/" + row.ID;
-
-
+            if ($.trim(row.MaintenanceStatus) == "SI20200097" || $.trim(row.MaintenanceStatus) == "SI20200109") {
+                window.location.href = "/Maintenances/Edit/" + row.ID;
+            } else {
+                //没有操作权限！
+                alert("没有操作权限");
+                return false;
+            }
         }
         else {
-            alert("没有操作权限！请先选择要编辑的数据")
+            alert("请先选择要编辑的数据")
         }
     };
 
@@ -178,17 +198,19 @@
             } return;
         }
        alert("需要先选择要作废的数据！")
-    
+
     }
 
-    
+
 
     //查询
     function Search() {
         //得到用户输入的参数，取值有几种方式：$("#id").combobox('getValue'), $("#id").datebox('getValue'), $("#id").val()
         //字段增加WHC_前缀字符，避免传递如URL这样的Request关键字冲突
         var queryData = {
-            Name: $("#Name").val()
+            Name: $("#Name").val(),
+            CreateDateStart: $("#CreateDateStart").val(),
+            CreateDateEnd: $("#CreateDateEnd").val()
         }
         //将值传递给
         InitGrid(queryData);
@@ -203,7 +225,7 @@
             queryParams: queryData,
             columns: [[
                  { field: 'ID', title: '运维单号', width: 150, align: 'center' },
-                 { field: 'Applier', title: '申请人', width: 150, align: 'center' }, 
+                 { field: 'Applier', title: '申请人', width: 150, align: 'center' },
                  { field: 'Region', title: '区域（申请人所在）', width: 150, align: 'center',formatter: getstatusnobyid },
                  { field: 'Type', title: '问题类型', width: 100, align: 'center', formatter: getstatusnobyid },
                  { field: 'Name', title: '问题名称', width: 150, align: 'center' },
@@ -228,13 +250,32 @@
             pageSize: 10,
             pageList: [10, 20, 30],
             method: 'get',
-            onClickRow: function (rowIndex, rowData) {
+            onDblClickRow: function (rowIndex, rowData) {
                 openNewWindow("@Url.Action("Details", "Maintenances", new { area=""})/" + rowData.ID,"newwindow",800,500);
             }
         });
     }
 
-    
+
+    function Import() {
+        var file = $("#Import").val();
+        if (file == "") {
+            alert("请选择导入文件");
+            return false;
+        }
+
+        fileUpload($("#Import"), {}, "@Url.Action("Import")",
+            function (data, status) {
+                alert(data.Message);
+                Search();
+            },
+            function (err) {
+
+
+            });
+
+    }
+
 </script>
 
-
+}

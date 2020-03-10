@@ -180,6 +180,7 @@
     <Compile Include="Attributes\LogAttribute.cs" />
     <Compile Include="Attributes\WebAuthorizeAttribute.cs" />
     <Compile Include="Common\ExcelHelper.cs" />
+    <Compile Include="Common\PredicateBuilder.cs" />
     <Compile Include="Controllers\ContactsController.cs" />
     <Compile Include="Controllers\HomeController.cs" />
     <Compile Include="Controllers\ItRolesController.cs" />
@@ -351,6 +352,7 @@
     <Content Include="Images\bgimg008.jpg" />
     <Content Include="Scripts\bootstrap.js" />
     <Content Include="Scripts\bootstrap.min.js" />
+    <Content Include="Content\Template\运维单信息.xlsx" />
     <None Include="Scripts\jquery-3.3.1.intellisense.js" />
     <Content Include="Scripts\common.js" />
     <Content Include="Scripts\fileUpload.js" />

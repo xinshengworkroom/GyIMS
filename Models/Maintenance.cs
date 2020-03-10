@@ -12,7 +12,7 @@ using System.Web;
 
 namespace GyIMS.Models
 {
-    public class Maintenance : IUnique, IName, ICommonStatus
+    public class Maintenance :  IName, ICommonStatus
     {
         public Maintenance()
         {
@@ -20,20 +20,24 @@ namespace GyIMS.Models
             this.UpdateDate = DateTime.Now;
             this.Status = CommonStatusEnum.Able;
         }
-        string id = String.Empty;
+        int? id;
         [DisplayName("运维单号")]
-        [StringLength(50)]
+        //[StringLength(50)]
         [Required]
         [Key]
-        public string ID
+        public int ID
         {
             get
             {
-                if (String.IsNullOrEmpty(this.id))
+                if (this.id != null)
                 {
-                    this.id = GeneratePrimaryKey.GetrimaryKey("Maintenance");
+                    //string str = GeneratePrimaryKey.GetrimaryKey("Maintenance");
+
+
+                    return this.id.Value;
                 }
-                return this.id;
+                return 1;
+            
             }
             set
             {
@@ -52,7 +56,7 @@ namespace GyIMS.Models
         [Required]
         public string Applier { get; set; }
 
-        [DisplayName("申请人")]
+        [DisplayName("申请人姓名")]
         [NotMapped]
         public string ApplierName
         {

@@ -45,7 +45,7 @@ namespace GyIMS.Controllers
             IQueryable<MaintenanceResult> maintenanceResults;
             if (!string.IsNullOrEmpty(name))
             {
-                maintenanceResults = _IMaintenanceResultQuery.GetModelsByPage(pageSize, pageNumber, true, u => u.ID, u => u.MaintenanceID.Contains(name) && u.Status == CommonStatusEnum.Able);
+                maintenanceResults = _IMaintenanceResultQuery.GetModelsByPage(pageSize, pageNumber, true, u => u.ID, u => u.Maintenance.Name.Contains(name) && u.Status == CommonStatusEnum.Able);
             }
             else
             {
@@ -72,7 +72,7 @@ namespace GyIMS.Controllers
             IQueryable<MaintenanceResult> maintenanceResults;
             if (!string.IsNullOrEmpty(name))
             {
-                maintenanceResults = _IMaintenanceResultQuery.GetModelsByPage(pageSize, pageNumber, true, u => u.ID, u => u.MaintenanceID.Contains(name) && u.Status == CommonStatusEnum.Able);
+                maintenanceResults = _IMaintenanceResultQuery.GetModelsByPage(pageSize, pageNumber, true, u => u.ID, u => u.Maintenance.Name.Contains(name) && u.Status == CommonStatusEnum.Able);
             }
             else
             {

@@ -39,9 +39,9 @@ namespace GyIMS.Models
         }
 
         [DisplayName("运维单号")]
-        [StringLength(50)]
+        //[StringLength(50)]
         [Required]
-        public string MaintenanceID { get; set; }
+        public int MaintenanceID { get; set; }
 
         [DisplayName("操作类型")]
         public string OperType { get; set; }

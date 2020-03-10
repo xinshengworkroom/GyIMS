@@ -1,14 +1,19 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.ComponentModel;
+using System.ComponentModel.DataAnnotations;
 using System.Data;
 using System.Data.Entity;
 using System.IO;
 using System.Linq;
+using System.Linq.Expressions;
 using System.Net;
+using System.Reflection;
 using System.Web;
 using System.Web.Mvc;
 using GyIMS.App_Helper;
 using GyIMS.Attributes;
+using GyIMS.Common;
 using GyIMS.Enums;
 using GyIMS.Helper;
 using GyIMS.Helper.Container;
@@ -43,36 +48,32 @@ namespace GyIMS.Controllers
 
         //GET: //GetMaintenanceList
         [HttpGet]
-        public ActionResult GetMaintenanceList(Maintenance maintenance)
+        public ActionResult GetMaintenanceList(Maintenance maintenance,string CreateDateStart,string CreateDateEnd)
         {
             var pageSize = Request["rows"] == "" ? 10 : int.Parse(Request["rows"]);
             var pageNumber = Request["page"] == "" ? 1 : int.Parse(Request["page"]);
-            string name = string.Empty;
-            if (Request["Name"] != "")
+            IEnumerable<Maintenance> maintenances = db.Maintenances.AsEnumerable();
+                //.Where(x => x.MaintenanceStatus == "SI20200097" ||
+                //     x.MaintenanceStatus == "SI20200099" ||
+                //    x.MaintenanceStatus == "SI20200109").AsEnumerable();
+            if (!string.IsNullOrEmpty(maintenance.Name))
             {
-                name = Request["Name"];
+                maintenances = maintenances.Where(x => x.Name.Contains(maintenance.Name));
             }
-            IQueryable<Maintenance> maintenances;
-            if (!string.IsNullOrEmpty(name))
+
+            if (!string.IsNullOrEmpty(CreateDateStart))
             {
-                maintenances = _IMaintenanceQuery.GetModelsByPage(
-                    pageSize, pageNumber, true, u => u.Name, u => u.Name.Contains(name) &&
-                    (u.MaintenanceStatus == "SI20200097" ||
-                     u.MaintenanceStatus == "SI20200099" ||
-                     u.MaintenanceStatus == "SI20200109")
-            );
+                maintenances = maintenances.Where(x => x.CreateDate >= DateTime.Parse(CreateDateStart));
             }
-            else
+
+            if (!string.IsNullOrEmpty(CreateDateEnd))
             {
-                maintenances = _IMaintenanceQuery.GetModelsByPage(
-                    pageSize, pageNumber, true, u => u.Name, u => u.Status == CommonStatusEnum.Able &&
-                    (u.MaintenanceStatus == "SI20200097" ||
-                     u.MaintenanceStatus == "SI20200099" ||
-                     u.MaintenanceStatus == "SI20200109")
-                    ) ;
-            }
+                maintenances = maintenances.Where(x => x.CreateDate <= DateTime.Parse(CreateDateEnd));
+            }           
+            maintenances = maintenances.OrderBy(x => x.ID).Skip((pageNumber - 1) * pageSize).Take(pageSize);
+
             var total = _IMaintenanceQuery.GetModels(u => true).Count();
-            var list = new PageView { rows = maintenances, total = total };
+            var list = new PageView { rows = maintenances.AsQueryable(), total = total };
             return Json(list, JsonRequestBehavior.AllowGet);
         }
 
@@ -100,6 +101,109 @@ namespace GyIMS.Controllers
             }
 
         }
+
+
+        [HttpPost]
+        public ActionResult Import()
+        {
+            HttpFileCollection files = System.Web.HttpContext.Current.Request.Files;
+
+
+            if (files != null && files.Count > 0)
+            {
+                HttpPostedFile file = files[0];
+                string extName = Path.GetExtension(file.FileName).ToLower();
+                if (extName != ".xls" && extName != ".xlsx")
+                {
+                    return Json(new { Message = "文件格式必须为.xls或.xlsx" }, JsonRequestBehavior.DenyGet);
+                }
+                string path = Server.MapPath("~/UploadFile");
+                if (!Directory.Exists(path))
+                {
+                    Directory.CreateDirectory(path);
+                }
+                string fname = Path.GetFileNameWithoutExtension(file.FileName);
+                string savaName = string.Concat(fname, DateTime.Now.ToString("_yyyyMMddHHmmss"), extName);
+                string filename = Path.Combine(path, savaName);
+                file.SaveAs(filename);
+                DataTable dt = ExcelHelper.ExcelToDataTable(filename);
+
+                if (dt != null && dt.Rows.Count > 0)
+                {
+                    try
+                    {
+                        Type type = typeof(Maintenance);
+                        PropertyInfo[] props = type.GetProperties();
+                        foreach (PropertyInfo p in props)
+                        {
+                            DisplayNameAttribute display = p.GetCustomAttribute<DisplayNameAttribute>();
+                            RequiredAttribute required = p.GetCustomAttribute<RequiredAttribute>();
+                            KeyAttribute key = p.GetCustomAttribute<KeyAttribute>();
+                            if (key == null && required != null && display != null)
+                            {
+                                if (!dt.Columns.Contains(display.DisplayName) || dt.Columns[display.DisplayName] == null)
+                                {
+                                    return Json(new { Message = string.Concat(display.DisplayName, ",为必填字段") }, JsonRequestBehavior.DenyGet);
+                                }
+                            }
+                        }
+
+                        foreach (DataRow row in dt.Rows)
+                        {
+                            Maintenance maintenance = new Maintenance();
+                            props = maintenance.GetType().GetProperties();
+                            foreach (PropertyInfo p in props)
+                            {
+                                DisplayNameAttribute display = p.GetCustomAttribute<DisplayNameAttribute>();
+                                if (display != null && dt.Columns.Contains(display.DisplayName))
+                                {
+                                    Object value = row[display.DisplayName];
+                                    if (value != null)
+                                    {
+                                        switch (p.Name)
+                                        {
+                                            case "Region":
+                                            case "Type":
+                                            case "Description":
+                                            case "MaintenanceStatus":                                           
+                                                p.SetValue(maintenance,value.ToString().Split('_')[0]);
+                                                break;
+                                            case "Status":
+                                                p.SetValue(maintenance, Enum.Parse(typeof(CommonStatusEnum), value.ToString().Split('_')[0]));
+                                                break;
+                                            default:
+                                                p.SetValue(maintenance, value);
+                                                break;
+                                        }
+                                    }
+                                   
+                                }
+                            }
+                            _IMaintenanceQuery.Add(maintenance);
+                        }
+                    }
+                    catch (Exception ex)
+                    {
+
+                        return Json(new { Message = ex.Message }, JsonRequestBehavior.DenyGet);
+
+                    }
+                }
+                else
+                {
+
+                }
+                System.IO.File.Delete(filename);
+                return Json(new { Message = "导入完成" }, JsonRequestBehavior.DenyGet);
+            }
+            else
+            {
+                return Json(new { Message = "请选择导入文件" }, JsonRequestBehavior.DenyGet);
+            }
+
+            
+        }
+
 
         #endregion
 
@@ -289,26 +393,30 @@ namespace GyIMS.Controllers
 
         //GET: //GetMaintenanceList
         [HttpGet]
-        public ActionResult GetMaintenanceApplyList()
+        public ActionResult GetMaintenanceApplyList(string rows,string page,string Name,string CreateDateStart,string CreateDateEnd)
         {
-            var pageSize = Request["rows"] == "" ? 10 : int.Parse(Request["rows"]);
-            var pageNumber = Request["page"] == "" ? 1 : int.Parse(Request["page"]);
-            string name = string.Empty;
-            if (Request["Name"] != "")
+            var pageSize = string.IsNullOrEmpty(rows) ? 10 : int.Parse(rows);
+            var pageNumber = string.IsNullOrEmpty(page) ? 1 : int.Parse(page);
+         
+            IEnumerable<Maintenance> maintenances = db.Maintenances.Where(x => x.MaintenanceStatus == "SI20200099").AsEnumerable();
+            if (!string.IsNullOrEmpty(Name))
             {
-                name = Request["Name"];
+                maintenances = maintenances.Where(x => x.Name.Contains(Name));
             }
-            IQueryable<Maintenance> maintenances;
-            if (!string.IsNullOrEmpty(name))
+
+            if (!string.IsNullOrEmpty(CreateDateStart))
             {
-                maintenances = db.Maintenances.OrderBy(x => x.Name).Where(x => x.Name.Contains(name) && (x.MaintenanceStatus == "SI20200099")).Skip((pageNumber - 1) * pageSize).Take(pageSize);
+                maintenances = maintenances.Where(x=>x.CreateDate >= DateTime.Parse(CreateDateStart));
             }
-            else
+
+            if (!string.IsNullOrEmpty(CreateDateEnd))
             {
-                maintenances = db.Maintenances.OrderBy(x => x.ID).Where(x => x.MaintenanceStatus == "SI20200099").Skip((pageNumber - 1) * pageSize).Take(pageSize);
+                maintenances = maintenances.Where(x => x.CreateDate <= DateTime.Parse(CreateDateEnd));
             }
             var total = maintenances.Count();
-            var list = new PageView { rows = maintenances, total = total };
+            maintenances = maintenances.OrderBy(x => x.ID).Skip((pageNumber - 1) * pageSize).Take(pageSize);
+
+            var list = new PageView { rows = maintenances.AsQueryable(), total = total };
             return Json(list, JsonRequestBehavior.AllowGet);
         }
 
@@ -794,11 +902,16 @@ namespace GyIMS.Controllers
         public ActionResult FileDownload(string filename)
         {
             //下载文件
-            string path = Server.MapPath("~/UploadFile/" + filename);
+            string path = Server.MapPath(string.Concat("~/", filename));
+            if (!filename.Contains("/"))
+               path = Server.MapPath(string.Concat("~/UploadFile/",filename));
+
+
+
             if (System.IO.File.Exists(path))
             {
                 FileStream fs = new FileStream(path, FileMode.Open);
-                return File(fs, "application/octet-stream", filename);
+                return File(fs, "application/octet-stream",new FileInfo(filename).Name);
             }
             else
             {
@@ -823,7 +936,7 @@ namespace GyIMS.Controllers
         }
 
         // GET: Maintenances/Details/5
-        public ActionResult Details(string id)
+        public ActionResult Details(int id)
         {
             if (id == null)
             {
@@ -867,7 +980,7 @@ namespace GyIMS.Controllers
         }
 
         // GET: Maintenances/Edit/5
-        public ActionResult Edit(string id)
+        public ActionResult Edit(int id)
         {
             if (id == null)
             {

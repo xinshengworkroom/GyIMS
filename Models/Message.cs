@@ -56,8 +56,8 @@ namespace GyIMS.Models
         }
 
         [DisplayName("运维业务单号")]
-        [StringLength(50)]
-        public string BizNo1 { get; set; }
+        //[StringLength(50)]
+        public int BizNo1 { get; set; }
 
         [DisplayName("问题名称")]
         [NotMapped]

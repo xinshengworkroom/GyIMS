@@ -7,6 +7,6 @@ namespace GyIMS.Interfaces
 {
     public interface IUnique
     {
-        string ID { get; }
+        String ID { get; }
     }
 }

@@ -190,12 +190,12 @@
             jQuery.globalEval(data);
         // Get the JavaScript object, if JSON is used.
         if (type == "json") {
-            //var reg = /<pre.+?>(.+)<\/pre>/g;
-            //var result = data.match(reg);
-            //data = RegExp.$1;
-            //data = jQuery.parseJSON(jQuery(data).text());
-            var str = $(data).find("body").text();//获取返回的字符串
-            data = jQuery.parseJSON(str);//把字符串转化为json对象
+            var reg = /<pre.+?>(.+)<\/pre>/g;
+            var result = data.match(reg);
+            data = RegExp.$1;
+            data = jQuery.parseJSON(data);
+            //var str = $(data).find("body").text();//获取返回的字符串
+            //data = jQuery.parseJSON(str);//把字符串转化为json对象
         }
            
         // evaluate scripts within html
