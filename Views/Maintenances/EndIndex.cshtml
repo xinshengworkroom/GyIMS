@@ -1,0 +1,159 @@
+﻿@model IEnumerable<GyIMS.Models.Maintenance>
+
+
+@{
+    ViewBag.Title = "运维单信息";
+}
+
+@*界面主体*@
+<div>
+
+    <div id="dg-search" margin="0,30,0,30">
+        <label for="Name">运维单号：</label>
+        <input id="Name" class="easyui-validatebox" data-options="width:200" />
+    </div>
+
+    <table id="dg"></table>
+
+    <div id="dg-button">
+        <a class="easyui-linkbutton" data-options="iconCls:'icon-search'" onclick="Search()">查询</a>
+        <a href="#" class="easyui-linkbutton" data-options="iconCls:'icon-reload'" onclick="Reload()">刷新</a>
+        @*<a href="/Maintenances/Create" class="easyui-linkbutton" data-options="iconCls:'icon-add'">添加</a>*@
+        @*<a href="javascript:void(0)" class="easyui-linkbutton" data-options="iconCls:'icon-edit' " onclick="Edit()">修改</a>*@
+        @*<a href="javascript:void(0)" class="easyui-linkbutton" data-options="iconCls:'icon-undo' " onclick="Draft()">草稿</a>*@
+        @*<a href="javascript:void(0)" class="easyui-linkbutton" data-options="iconCls:'icon-man' " onclick="Apply()">申请</a>
+        <a href="javascript:void(0)" class="easyui-linkbutton" data-options="iconCls:'icon-redo' " onclick="Accept()">接单</a>
+        <a href="javascript:void(0)" class="easyui-linkbutton" data-options="iconCls:'icon-print' " onclick="Handle()">处理</a>*@
+        <a href="javascript:void(0)" class="easyui-linkbutton" data-options="iconCls:'icon-ok' " onclick="End()">结案</a>
+        @*<a href="javascript:void(0)" class="easyui-linkbutton" data-options="iconCls:'icon-back' " onclick="Return()">退回</a>
+        <a href="javascript:void(0)" class="easyui-linkbutton" data-options="iconCls:'icon-cancel' " onclick="Cancel()">作废</a>
+        <a href="javascript:void(0)" class="easyui-linkbutton" data-options="iconCls:'icon-mini-add' " onclick="Hang_up()">挂起</a>
+        <a href="javascript:void(0)" class="easyui-linkbutton" data-options="iconCls:'icon-remove'" onclick="Delete()">删除</a>*@
+        @*<a href="#" class="easyui-linkbutton" data-options="iconCls:'icon-blank'" onclick="Export()">导出</a>*@
+    </div>
+
+</div>
+
+@*脚本*@
+<script>
+
+    $(function () {
+        $("#dg").datagrid({
+            title: '运维申请单信息列表',
+            url: '/Maintenances/GetMaintenanceEndList',
+            queryParams: "",
+            columns: [[
+                 { field: 'ID', title: '运维单号', width: 150, align: 'center' },
+                 { field: 'Applier', title: '申请人', width: 150, align: 'center' }, 
+                 { field: 'Region', title: '区域（申请人所在）', width: 150, align: 'center',formatter: getstatusnobyid  },
+                 { field: 'Type', title: '问题类型', width: 100, align: 'center',formatter: getstatusnobyid  },
+                 { field: 'Name', title: '问题名称', width: 150, align: 'center' },
+                 { field: 'FileName', title: '上传文件名称', width: 150, align: 'center' },
+                 { field: 'Description', title: '问题描述', width: 150, align: 'center' },
+                 { field: 'MaintenanceStatus', title: '运维状态', width: 150, align: 'center',formatter: getstatusnobyid  },
+                 { field: 'StatusName', title: '状态', width: 60, align: 'center' },
+                 {field: 'CreateDate', title: '创建时间', width: 100, formatter: getdate, align: 'center'},
+                 { field: 'CreatePerson', title: '创建人', width: 100, align: 'center' },
+                 {field: 'UpdateDate', title: '修改时间', width: 100, formatter: getdate, align: 'center'},
+                 { field: 'UpdatePerson', title: '修改人', width: 100, align: 'center' },
+                 { field: 'Summary', title: '备注', width: 100, align: 'center' }
+            ]],
+            toolbar: '#dg-button',
+            singleSelect: true,
+            pagination: true,
+            pageSize: 10,
+            pageList: [10, 20, 30],
+            method: 'get'
+        });
+    })
+
+    //刷新
+    function Reload() {
+        $('#Name').val("");
+        InitGrid("");
+    }
+
+    var GetTableName = "Maintenances";
+    var dg = $('#dg');
+    var Datajson = new Object();
+    //结案
+    function End() {
+        var row = dg.datagrid('getSelected');
+        if (row != null) {
+
+            if (confirm("你确定要结案该运维请单信息吗？")) {
+
+                StatusJson.TableName = "Maintenances";
+                StatusJson.StatusDesc = "MTStatus";
+                StatusJson.StatusNo = "已结案";
+                GetTabStatusID(StatusJson);
+
+                Datajson.ID = row.ID;
+                Datajson.MaintenanceStatus = GetStausID;
+                $.ajax({
+                    url: '/Maintenances/EndByAjax',//地址
+                    dataType: 'json',//返回数据类型
+                    type: 'POST',//类型
+                    data: Datajson ,
+                    //请求成功
+                    success: function () {
+                        alert("结案成功！");
+                        window.location.href = "/Maintenances/EndIndex/";
+                    }
+                })
+
+            } return;
+        }
+       alert("需要先选择要结案的数据！")
+    }
+
+    //查询
+    function Search() {
+        //得到用户输入的参数，取值有几种方式：$("#id").combobox('getValue'), $("#id").datebox('getValue'), $("#id").val()
+        //字段增加WHC_前缀字符，避免传递如URL这样的Request关键字冲突
+        var queryData = {
+            Name: $("#Name").val()
+        }
+        //将值传递给
+        InitGrid(queryData);
+        return false;
+    }
+
+    //初始化查询数据
+    function InitGrid(queryData) {
+        $("#dg").datagrid({
+            title: '运维清单信息列表',
+            url: '/Maintenances/GetMaintenanceEndList',
+            queryParams: queryData,
+            columns: [[
+                  { field: 'ID', title: '运维单号', width: 150, align: 'center' },
+                 { field: 'Applier', title: '申请人', width: 150, align: 'center' }, 
+                 { field: 'Region', title: '区域（申请人所在）', width: 150, align: 'center',formatter: getstatusnobyid  },
+                 { field: 'Type', title: '问题类型', width: 100, align: 'center',formatter: getstatusnobyid  },
+                 { field: 'Name', title: '问题名称', width: 150, align: 'center' },
+                 { field: 'FileName', title: '上传文件名称', width: 150, align: 'center' },
+                 { field: 'Description', title: '问题描述', width: 150, align: 'center' },
+                 { field: 'MaintenanceStatus', title: '运维状态', width: 150, align: 'center',formatter: getstatusnobyid  },
+                 { field: 'StatusName', title: '状态', width: 60, align: 'center' },
+                 {field: 'CreateDate', title: '创建时间', width: 100, formatter: getdate, align: 'center'},
+                 { field: 'CreatePerson', title: '创建人', width: 100, align: 'center' },
+                 {field: 'UpdateDate', title: '修改时间', width: 100, formatter: getdate, align: 'center'},
+                 { field: 'UpdatePerson', title: '修改人', width: 100, align: 'center' },
+                 { field: 'Summary', title: '备注', width: 100, align: 'center' }
+            ]],
+            toolbar: '#dg-button',
+            singleSelect: true,
+            pagination: true,
+            pageSize: 10,
+            pageList: [10, 20, 30],
+            method: 'get'
+        });
+    }
+
+    
+
+</script>
+
+
+
+

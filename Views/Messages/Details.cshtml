@@ -1,0 +1,82 @@
+﻿@model GyIMS.Models.Message
+
+@{
+    ViewBag.Title = "Details";
+}
+
+<h2>Details</h2>
+
+<div>
+    <h4>Message</h4>
+    <hr />
+    <dl class="dl-horizontal">
+        <dt>
+            @Html.DisplayNameFor(model => model.Maintenance.Code)
+        </dt>
+
+        <dd>
+            @Html.DisplayFor(model => model.Maintenance.Code)
+        </dd>
+
+        <dt>
+            @Html.DisplayNameFor(model => model.RequestForm.Code)
+        </dt>
+
+        <dd>
+            @Html.DisplayFor(model => model.RequestForm.Code)
+        </dd>
+
+        <dt>
+            @Html.DisplayNameFor(model => model.BizType)
+        </dt>
+
+        <dd>
+            @Html.DisplayFor(model => model.BizType)
+        </dd>
+
+        <dt>
+            @Html.DisplayNameFor(model => model.BizName)
+        </dt>
+
+        <dd>
+            @Html.DisplayFor(model => model.BizName)
+        </dd>
+
+        <dt>
+            @Html.DisplayNameFor(model => model.NotifyParty)
+        </dt>
+
+        <dd>
+            @Html.DisplayFor(model => model.NotifyParty)
+        </dd>
+
+        <dt>
+            @Html.DisplayNameFor(model => model.Status)
+        </dt>
+
+        <dd>
+            @Html.DisplayFor(model => model.Status)
+        </dd>
+
+        <dt>
+            @Html.DisplayNameFor(model => model.CreateDate)
+        </dt>
+
+        <dd>
+            @Html.DisplayFor(model => model.CreateDate)
+        </dd>
+
+        <dt>
+            @Html.DisplayNameFor(model => model.ConsultDate)
+        </dt>
+
+        <dd>
+            @Html.DisplayFor(model => model.ConsultDate)
+        </dd>
+
+    </dl>
+</div>
+<p>
+    @Html.ActionLink("Edit", "Edit", new { id = Model.ID }) |
+    @Html.ActionLink("Back to List", "Index")
+</p>

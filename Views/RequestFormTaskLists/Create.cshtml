@@ -1,0 +1,278 @@
+﻿@model GyIMS.Models.RequestFormTaskList
+
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="UTF-8">
+    <title>需求任务明细-新增</title>
+</head>
+
+<body>
+    <div style="margin:20px 0;"></div>
+
+    <div class="easyui-panel" title="需求任务明细-新增" style="width:100%;height:100%">
+        <div>
+            <form id="Create" method="post" style="width:100%;height:100%">
+                <table style="width:100%;height:100%" cellpadding="10" cellspacing="50">
+                    <tr>
+                        <th width="20%"></th>
+                        <th width="30%"></th>
+                        <th width="20%"></th>
+                        <th width="30%"></th>
+                    </tr>
+                    <tr>
+                        <td align="center">需求任务明细编号:</td>
+                        <td>
+                            <input class="easyui-textbox" type="text" name="ID"
+                                   data-options="required:true" readonly="readonly" style="width:300px" />
+                        </td>
+                        <td align="center">需求申请单号:</td>
+                        <td>
+                            <select class="easyui-combobox" name="RequestFormID" id="RequestFormID" data-options="required:true" style="width:300px" />
+
+                        </td>
+
+                    </tr>
+                    <tr>
+                        <td align="center">需求任务编号:</td>
+                        <td>
+                            <input class="easyui-textbox" type="text" name="RequestFormTaskID"
+                                   data-options="required:true" readonly="readonly" style="width:300px" />
+                        </td>
+                        <td align="center">任务序号:</td>
+                        <td>
+                            <input class="easyui-textbox" type="text" name="TaskSeqNo"
+                                   data-options="required:true" style="width:300px" />
+                        </td>
+                    </tr>
+                    <tr>
+                        <td align="center">处理人:</td>
+                        <td>
+                            <input class="easyui-textbox" type="text" name="Handler"
+                                   data-options="required:true" style="width:300px" />
+                        </td>
+                        <td align="center">处理日期：</td>
+                        <td>
+                            <input class="easyui-datebox" data-options="formatter:ww4,sharedCalendar:'#cc'"
+                                   style="width:300px;" id="HandleDate">
+                            <div id="cc" class="easyui-calendar"></div>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td align="center">开始时间：</td>
+                        <td>
+                            @*<input class="easyui-datebox" data-options="formatter:ww4,sharedCalendar:'#cc'"
+                                       style="width:300px;" id="FromTime">
+                                <div id="cc" class="easyui-calendar"></div>*@
+                            <input id="FromTime" type="text" style="width:300px;">
+                        </td>
+                        <td align="center">结束时间：</td>
+                        <td>
+                            @*<input class="easyui-datebox" data-options="formatter:ww4,sharedCalendar:'#cc'"
+                                       style="width:300px;" id="ToTime">
+                                <div id="cc" class="easyui-calendar"></div>*@
+                            <input id="ToTime" type="text" style="width:300px;">
+                        </td>
+                    </tr>
+                    <tr>
+                        <td align="center">完成比例（0-100）:</td>
+                        <td>
+                            <input class="easyui-textbox" type="text" name="RateOfProgress"
+                                   style="width:300px" />
+                        </td>
+                        <td align="center">状态:</td>
+                        <td>
+                            <select class="easyui-combobox" name="Status" id="Status" data-options="required:true" style="width:300px" />
+                        </td>
+
+                    </tr>
+                    <tr>
+                        <td align="center">创建时间:</td>
+                        <td>
+                            <input class="easyui-textbox" type="text" name="CreateDate" data-options="required:true" readonly="readonly" style="width:300px" />
+                        </td>
+                        <td align="center">创建人:</td>
+                        <td>
+                            <input class="easyui-textbox" type="text" name="CreatePerson" style="width:300px" />
+                        </td>
+                    </tr>
+                    <tr>
+                        <td align="center">修改时间:</td>
+                        <td>
+                            <input class="easyui-textbox" type="text" name="UpdateDate" data-options="required:true" readonly="readonly" style="width:300px" />
+                        </td>
+                        <td align="center">修改人:</td>
+                        <td>
+                            <input class="easyui-textbox" type="text" name="UpdatePerson" style="width:300px" />
+                        </td>
+                    </tr>
+                    <tr style="margin-top:100px">
+                        <td align="center">备注:</td>
+                        <td colspan="3">
+                            <input class="easyui-textbox" name="Summary" data-options="multiline:true"
+                                   style="height:60px;width:875px" />
+                        </td>
+                    </tr>
+                </table>
+            </form>
+            <div style="text-align:center;padding:5px;margin-top:50px">
+                <a href="javascript:void(0)" class="easyui-linkbutton" onclick="submitForm()">提交</a>
+                <a href="javascript:void(0)" class="easyui-linkbutton" onclick="backList()">返回</a>
+            </div>
+        </div>
+    </div>
+
+    @*Js脚本*@
+    <script type="text/javascript">
+
+        $(function () {
+    //新增初始化数据
+    $('#Create').form('load', {
+        ID: '@Model.ID',
+        RequestFormTaskID:'@ViewBag.RequestFormTaskID',
+        CreateDate: '@Model.CreateDate',
+        CreatePerson: '@HttpContext.Current.Session["UserID"]',
+        UpdateDate: '@Model.CreateDate',
+        UpdatePerson: '@HttpContext.Current.Session["UserID"]'
+    });
+
+     //状态
+    $('#Status').combobox({
+        url: '/RequestFormTaskLists/GetStatus',
+        textField: 'text',
+        valueField: 'id',
+        panelHeight: 'auto',
+        data: {},
+        method: 'get',
+        onLoadSuccess: function () {
+            var id;
+            if ('@Model.Status' == 'Disabled') {
+                id = 0;
+            }
+            else if ('@Model.Status' == 'Able') {
+                id = 1;
+            }
+            else
+            {
+                id = 1;
+            }
+            $('#Status').combobox('setValue', id);
+        }
+    });
+
+
+
+    //需求申请单
+    $('#RequestFormID').combobox({
+        url: '/RequestFormTaskLists/GetRequestForms',
+        textField: 'text',
+        valueField: 'id',
+        panelHeight: 'auto',
+        data: {},
+        method: 'get',
+        onLoadSuccess: function () {
+            $('#RequestFormID').combobox('setValue', '@Model.RequestFormID');
+        }
+    });
+
+        //需求任务
+    $('#RequestFormTaskID').combobox({
+        url: '/RequestFormTaskLists/GetRequestFormTasks',
+        textField: 'text',
+        valueField: 'id',
+        panelHeight: 'auto',
+        data: {},
+        method: 'get',
+        onLoadSuccess: function () {
+            $('#RequestFormTaskID').combobox('setValue', '@Model.RequestFormTaskID');
+        }
+    });
+
+
+
+
+        $('#FromTime').datetimebox({
+   showSeconds:false,
+   required:true,
+   onSelect:function(date){
+        var y = date.getFullYear();
+        var m = date.getMonth() + 1;
+        var d = date.getDate();
+        var time=$('#FromTime').datetimebox('spinner').spinner('getValue');
+        var dateTime = y + "-" + (m < 10 ? ("0" + m) : m) + "-" + (d < 10 ? ("0" + d) : d) +' '+time;
+        $('#FromTime').datetimebox('setText', dateTime);
+        $('#FromTime').datetimebox('hidePanel');
+        // $('#TextStartTime').val(dateTime);
+   }
+        });
+
+        $('#ToTime').datetimebox({
+   showSeconds:false,
+   required:true,
+   onSelect:function(date){
+        var y = date.getFullYear();
+        var m = date.getMonth() + 1;
+        var d = date.getDate();
+        var time=$('#ToTime').datetimebox('spinner').spinner('getValue');
+        var dateTime = y + "-" + (m < 10 ? ("0" + m) : m) + "-" + (d < 10 ? ("0" + d) : d) +' '+time;
+        $('#ToTime').datetimebox('setText', dateTime);
+        $('#ToTime').datetimebox('hidePanel');
+        // $('#TextStartTime').val(dateTime);
+   }
+        });
+            });
+
+    //新增提交
+    function submitForm() {
+        $('#Create').form('submit', {
+            url: '/RequestFormTaskLists/CreateByForm/',
+            dataType:"json",
+            onSubmit: function (param) {
+                param.ID = $('#ID').val();
+                param.RequestFormID = $('#RequestFormID').val();
+                param.RequestFormTaskID = $('#RequestFormTaskID').val();
+                param.TaskSeqNO = $('#TaskSeqNo').val();
+                param.Handler = $('#Handler').val();
+                param.HandleDate = $('#HandleDate').val();
+                param.FromTime = $('#FromTime').val();
+                param.ToTime = $('#ToTime').val();
+                param.RateOfProgress = $('#RateOfProgress').val();
+                param.Status = $('#Status').val();
+                param.CreateDate = $('#CreateDate').val();
+                param.CreatePerson = $('#CreatePerson').val();
+                param.UpdateDate = $('#UpdateDate').val();
+                param.UpdatePerson = $('#UpdatePerson').val();
+                param.Summary = $('#Summary').val();
+
+            },
+            success: function (data) {
+                    data = JSON.parse(data);
+                    alert(data.Message);
+                    if (data.Code == 1) {
+                    window.location.href = "/RequestFormTaskLists/Index?requestFormTaskID=" + '@ViewBag.RequestFormTaskID';
+                    }
+                }
+            });
+        }
+
+         //格式化日期
+         function ww4(date){
+            var y = date.getFullYear();
+            var m = date.getMonth()+1;
+            var d = date.getDate()
+            return  y+'-'+m+'-'+d;
+         }
+
+        function backList() {
+            window.location.href = "/RequestFormTaskLists/Index?requestFormTaskID=" + '@ViewBag.RequestFormTaskID';
+        }
+
+    </script>
+
+
+</body>
+
+
+</html>
+

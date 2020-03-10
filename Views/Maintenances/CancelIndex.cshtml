@@ -1,0 +1,376 @@
+﻿@model IEnumerable<GyIMS.Models.Maintenance>
+
+
+@{
+    ViewBag.Title = "运维单信息";
+}
+
+@*界面主体*@
+<div>
+
+    <div id="dg-search" margin="0,30,0,30">
+        <label for="Name">运维单号：</label>
+        <input id="Name" class="easyui-validatebox" data-options="width:200" />
+    </div>
+
+    <table id="dg"></table>
+
+    <div id="dg-button">
+        <a class="easyui-linkbutton" data-options="iconCls:'icon-search'" onclick="Search()">查询</a>
+        <a href="#" class="easyui-linkbutton" data-options="iconCls:'icon-reload'" onclick="Reload()">刷新</a>
+        @*<a href="/Maintenances/Create" class="easyui-linkbutton" data-options="iconCls:'icon-add'">添加</a>*@
+        <a href="javascript:void(0)" class="easyui-linkbutton" data-options="iconCls:'icon-edit' " onclick="Edit()">修改</a>
+        @*<a href="javascript:void(0)" class="easyui-linkbutton" data-options="iconCls:'icon-undo' " onclick="Draft()">草稿</a>*@
+        <a href="javascript:void(0)" class="easyui-linkbutton" data-options="iconCls:'icon-man' " onclick="Apply()">申请</a>
+        <a href="javascript:void(0)" class="easyui-linkbutton" data-options="iconCls:'icon-redo' " onclick="Accept()">接单</a>
+        <a href="javascript:void(0)" class="easyui-linkbutton" data-options="iconCls:'icon-print' " onclick="Handle()">处理</a>
+        <a href="javascript:void(0)" class="easyui-linkbutton" data-options="iconCls:'icon-ok' " onclick="End()">结案</a>
+        <a href="javascript:void(0)" class="easyui-linkbutton" data-options="iconCls:'icon-back' " onclick="Return()">退回</a>
+        <a href="javascript:void(0)" class="easyui-linkbutton" data-options="iconCls:'icon-cancel' " onclick="Cancel()">作废</a>
+        <a href="javascript:void(0)" class="easyui-linkbutton" data-options="iconCls:'icon-mini-add' " onclick="Hang_up()">挂起</a>
+        <a href="javascript:void(0)" class="easyui-linkbutton" data-options="iconCls:'icon-remove'" onclick="Delete()">删除</a>
+        @*<a href="#" class="easyui-linkbutton" data-options="iconCls:'icon-blank'" onclick="Export()">导出</a>*@
+    </div>
+
+</div>
+
+@*脚本*@
+<script>
+
+    $(function () {
+        $("#dg").datagrid({
+            title: '运维申请单信息列表',
+            url: '/Maintenances/GetMaintenanceCancelList',
+            queryParams: "",
+            columns: [[
+                 { field: 'ID', title: '运维单号', width: 150, align: 'center' },
+                 { field: 'Code', title: '单号', width: 100, align: 'center' },
+                 { field: 'Applier', title: '申请人', width: 150, align: 'center' },
+                 { field: 'Region', title: '区域（申请人所在）', width: 150, align: 'center' },
+                 { field: 'TypeName', title: '问题类型', width: 100, align: 'center' },
+                 { field: 'SysTypeName', title: '软件系统类型', width: 150, align: 'center' },
+                 { field: 'HSysTypeName', title: '硬件系统类型', width: 150, align: 'center' },
+                 { field: 'Name', title: '问题名称', width: 150, align: 'center' },
+                { field: 'Description', title: '问题描述', width: 150, align: 'center' },
+                 { field: 'MaintenanceStatusName', title: '运维状态', width: 150, align: 'center' },
+                 { field: 'StatusName', title: '状态', width: 60, align: 'center' },
+                 {
+                     field: 'CreateDate', title: '创建时间', width: 100, formatter: function (value, row, index) {
+                         return new Date(parseInt(value.substr(6, 13))).toLocaleDateString();
+                     }, align: 'center'
+                 },
+                 { field: 'CreatePersonName', title: '创建人', width: 100, align: 'center' },
+                 {
+                      field: 'UpdateDate', title: '修改时间', width: 100, formatter: function (value, row, index) {
+                          return new Date(parseInt(value.substr(6, 13))).toLocaleDateString();
+                      }, align: 'center'
+                  },
+                 { field: 'UpdatePersonName', title: '修改人', width: 100, align: 'center' },
+                 { field: 'Summary', title: '备注', width: 100, align: 'center' }
+            ]],
+            toolbar: '#dg-button',
+            singleSelect: true,
+            pagination: true,
+            pageSize: 10,
+            pageList: [10, 20, 30],
+            method: 'get'
+        });
+    })
+
+    //刷新
+    function Reload() {
+        $('#Name').val("");
+        InitGrid("");
+    }
+
+    //修改
+    function Edit() {
+        var row = $('#dg').datagrid('getSelected');
+        if (row == null) {
+            alert("需要先选择要修改的数据！")
+        }
+        else {
+            window.location.href = "/Maintenances/Edit/" + row.ID;
+        }
+
+    };
+
+    //删除
+    function Delete() {
+        var row = $('#dg').datagrid('getSelected');
+        if (row == null) {
+            alert("需要先选择要删除的数据！")
+        }
+        else {
+            if (confirm("你确定要删除该运维单信息吗？")) {
+                $.ajax({
+                    url: '/Maintenances/DeleteByAjax',//地址
+                    dataType: 'text',//返回数据类型
+                    type: 'POST',//类型
+                    data: { id: row.ID },
+                    //请求成功
+                    success: function () {
+                        alert("删除数据成功！");
+                        window.location.href = "/Maintenances/CancelIndex/";
+                    }
+                })
+            }
+
+        }
+    }
+
+    //草稿
+    function Draft() {
+        var row = $('#dg').datagrid('getSelected');
+        if (row == null) {
+            alert("需要先选择要编辑的数据！")
+        }
+        else {
+            if (confirm("你确定要编辑该运维单信息吗？")) {
+                $.ajax({
+                    url: '/Maintenances/DraftByAjax',//地址
+                    dataType: 'text',//返回数据类型
+                    type: 'POST',//类型
+                    data: { id: row.ID },
+                    //请求成功
+                    success: function () {
+                        alert("编辑数据成功！");
+                        window.location.href = "/Maintenances/CancelIndex/";
+                    }
+                })
+            }
+
+        }
+    }
+
+    //申请
+    function Apply() {
+        var row = $('#dg').datagrid('getSelected');
+        if (row == null) {
+            alert("需要先选择要申请的数据！")
+        }
+        else {
+            if (confirm("你确定要申请该运维单信息吗？")) {
+                $.ajax({
+                    url: '/Maintenances/ApplyByAjax',//地址
+                    dataType: 'text',//返回数据类型
+                    type: 'POST',//类型
+                    data: { id: row.ID },
+                    //请求成功
+                    success: function () {
+                        alert("申请成功！");
+                        window.location.href = "/Maintenances/CancelIndex/";
+                    }
+                })
+            }
+
+        }
+    }
+
+    //接单
+    function Accept() {
+        var row = $('#dg').datagrid('getSelected');
+        if (row == null) {
+            alert("需要先选择要接单的数据！")
+        }
+        else {
+            if (confirm("你确定要接受该运维单信息吗？")) {
+                $.ajax({
+                    url: '/Maintenances/AcceptByAjax',//地址
+                    dataType: 'text',//返回数据类型
+                    type: 'POST',//类型
+                    data: { id: row.ID },
+                    //请求成功
+                    success: function () {
+                        alert("接单成功！");
+                        window.location.href = "/Maintenances/CancelIndex/";
+                    }
+                })
+            }
+
+        }
+    }
+
+    //处理
+    function Handle() {
+        var row = $('#dg').datagrid('getSelected');
+        if (row == null) {
+            alert("需要先选择要处理的数据！")
+        }
+        else {
+            if (confirm("你确定要处理该运维单信息吗？")) {
+                $.ajax({
+                    url: '/Maintenances/HandleByAjax',//地址
+                    dataType: 'text',//返回数据类型
+                    type: 'POST',//类型
+                    data: { id: row.ID },
+                    //请求成功
+                    success: function () {
+                        alert("处理成功！");
+                        window.location.href = "/Maintenances/CancelIndex/";
+                    }
+                })
+            }
+
+        }
+    }
+
+    //结案
+    function End() {
+        var row = $('#dg').datagrid('getSelected');
+        if (row == null) {
+            alert("需要先选择要结案的数据！")
+        }
+        else {
+            if (confirm("你确定要结案该运维单信息吗？")) {
+                $.ajax({
+                    url: '/Maintenances/EndByAjax',//地址
+                    dataType: 'text',//返回数据类型
+                    type: 'POST',//类型
+                    data: { id: row.ID },
+                    //请求成功
+                    success: function () {
+                        alert("结案成功！");
+                        window.location.href = "/Maintenances/CancelIndex/";
+                    }
+                })
+            }
+
+        }
+    }
+
+    //退回
+    function Return() {
+        var row = $('#dg').datagrid('getSelected');
+        if (row == null) {
+            alert("需要先选择要退回的数据！")
+        }
+        else {
+            if (confirm("你确定要退回该运维单信息吗？")) {
+                $.ajax({
+                    url: '/Maintenances/ReturnByAjax',//地址
+                    dataType: 'text',//返回数据类型
+                    type: 'POST',//类型
+                    data: { id: row.ID },
+                    //请求成功
+                    success: function () {
+                        alert("退回成功！");
+                        window.location.href = "/Maintenances/CancelIndex/";
+                    }
+                })
+            }
+
+        }
+    }
+
+    //作废
+    function Cancel() {
+        var row = $('#dg').datagrid('getSelected');
+        if (row == null) {
+            alert("需要先选择要作废的数据！")
+        }
+        else {
+            if (confirm("你确定要作废该运维单信息吗？")) {
+                $.ajax({
+                    url: '/Maintenances/CancelByAjax',//地址
+                    dataType: 'text',//返回数据类型
+                    type: 'POST',//类型
+                    data: { id: row.ID },
+                    //请求成功
+                    success: function () {
+                        alert("作废成功！");
+                        window.location.href = "/Maintenances/CancelIndex/";
+                    }
+                })
+            }
+
+        }
+    }
+
+    //挂起
+    function Hang_up() {
+        var row = $('#dg').datagrid('getSelected');
+        if (row == null) {
+            alert("需要先选择要挂起的数据！")
+        }
+        else {
+            if (confirm("你确定要挂起该运维单信息吗？")) {
+                $.ajax({
+                    url: '/Maintenances/Hang_upByAjax',//地址
+                    dataType: 'text',//返回数据类型
+                    type: 'POST',//类型
+                    data: { id: row.ID },
+                    //请求成功
+                    success: function () {
+                        alert("挂起成功！");
+                        window.location.href = "/Maintenances/CancelIndex/";
+                    }
+                })
+            }
+
+        }
+    }
+
+    //查询
+    function Search() {
+        //得到用户输入的参数，取值有几种方式：$("#id").combobox('getValue'), $("#id").datebox('getValue'), $("#id").val()
+        //字段增加WHC_前缀字符，避免传递如URL这样的Request关键字冲突
+        var queryData = {
+            Name: $("#Name").val()
+        }
+        //将值传递给
+        InitGrid(queryData);
+        return false;
+    }
+
+    //初始化查询数据
+    function InitGrid(queryData) {
+        $("#dg").datagrid({
+            title: '运维生清单信息列表',
+            url: '/Maintenances/GetMaintenanceCancelList',
+            queryParams: queryData,
+            columns: [[
+                  { field: 'ID', title: '运维单号', width: 150, align: 'center' },
+                  { field: 'Code', title: '单号', width: 100, align: 'center' },
+                  { field: 'Applier', title: '申请人', width: 150, align: 'center' },
+                  { field: 'Region', title: '区域（申请人所在）', width: 150, align: 'center' },
+                  { field: 'TypeName', title: '问题类型', width: 100, align: 'center' },
+                  { field: 'SysTypeName', title: '软件系统类型', width: 150, align: 'center' },
+                  { field: 'HSysTypeName', title: '硬件系统类型', width: 150, align: 'center' },
+                  { field: 'Name', title: '问题名称', width: 150, align: 'center' },
+                { field: 'Description', title: '问题描述', width: 150, align: 'center' },
+                  { field: 'MaintenanceStatusName', title: '运维状态', width: 150, align: 'center' },
+                  { field: 'StatusName', title: '状态', width: 60, align: 'center' },
+                  {
+                     field: 'CreateDate', title: '创建时间', width: 100, formatter: function (value, row, index) {
+                         return new Date(parseInt(value.substr(6, 13))).toLocaleDateString();
+                     }, align: 'center'
+                  },
+                  { field: 'CreatePersonName', title: '创建人', width: 100, align: 'center' },
+                  {
+                      field: 'UpdateDate', title: '修改时间', width: 100, formatter: function (value, row, index) {
+                          return new Date(parseInt(value.substr(6, 13))).toLocaleDateString();
+                      }, align: 'center'
+                  },
+                  { field: 'UpdatePersonName', title: '修改人', width: 100, align: 'center' },
+                  { field: 'Summary', title: '备注', width: 100, align: 'center' }
+            ]],
+            toolbar: '#dg-button',
+            singleSelect: true,
+            pagination: true,
+            pageSize: 10,
+            pageList: [10, 20, 30],
+            method: 'get'
+        });
+    }
+
+    //日期格式转换
+    function GetDateFormat(str) {
+        return new Date(parseInt(str.substr(6, 13))).toLocaleDateString();
+    }
+
+</script>
+
+
+
+

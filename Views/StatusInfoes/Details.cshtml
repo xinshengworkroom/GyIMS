@@ -1,0 +1,90 @@
+﻿@model GyIMS.Models.StatusInfo
+
+@{
+    ViewBag.Title = "Details";
+}
+
+<h2>Details</h2>
+
+<div>
+    <h4>StatusInfo</h4>
+    <hr />
+    <dl class="dl-horizontal">
+        <dt>
+            @Html.DisplayNameFor(model => model.TableName)
+        </dt>
+
+        <dd>
+            @Html.DisplayFor(model => model.TableName)
+        </dd>
+
+        <dt>
+            @Html.DisplayNameFor(model => model.StatusNo)
+        </dt>
+
+        <dd>
+            @Html.DisplayFor(model => model.StatusNo)
+        </dd>
+
+        <dt>
+            @Html.DisplayNameFor(model => model.StatusNameCH)
+        </dt>
+
+        <dd>
+            @Html.DisplayFor(model => model.StatusNameCH)
+        </dd>
+
+        <dt>
+            @Html.DisplayNameFor(model => model.StatusNameEN)
+        </dt>
+
+        <dd>
+            @Html.DisplayFor(model => model.StatusNameEN)
+        </dd>
+
+        <dt>
+            @Html.DisplayNameFor(model => model.StatusDesc)
+        </dt>
+
+        <dd>
+            @Html.DisplayFor(model => model.StatusDesc)
+        </dd>
+
+        <dt>
+            @Html.DisplayNameFor(model => model.CreateUserId)
+        </dt>
+
+        <dd>
+            @Html.DisplayFor(model => model.CreateUserId)
+        </dd>
+
+        <dt>
+            @Html.DisplayNameFor(model => model.UpdateUserId)
+        </dt>
+
+        <dd>
+            @Html.DisplayFor(model => model.UpdateUserId)
+        </dd>
+
+        <dt>
+            @Html.DisplayNameFor(model => model.CreateDate)
+        </dt>
+
+        <dd>
+            @Html.DisplayFor(model => model.CreateDate)
+        </dd>
+
+        <dt>
+            @Html.DisplayNameFor(model => model.UpdateDate)
+        </dt>
+
+        <dd>
+            @Html.DisplayFor(model => model.UpdateDate)
+        </dd>
+
+    </dl>
+</div>
+<p>
+    @Html.ActionLink("Edit", "Edit", new { id = Model.ID }) |
+    @Html.ActionLink("Back to List", "Index")
+</p>

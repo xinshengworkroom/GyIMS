@@ -1,0 +1,224 @@
+﻿@model GyIMS.Models.MaintenanceFile
+
+
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title> 运维附件信息 - 编辑 </title>
+</head>
+
+<body>
+    <div style="margin:20px 0;"></div>
+
+    <div class="easyui-panel" title="运维附件-编辑" style="width:100%;height:100%">
+        <div>
+            <form id="Edit" method="post" style="width:100%;height:100%">
+                <table style="width:100%;height:100%" cellpadding="10" cellspacing="50">
+                    <tr>
+                        <th width="20%">
+                        </th>
+                        <th width="30%">
+                        </th>
+                        <th width="20%">
+                        </th>
+                        <th width="30%">
+                        </th>
+                    </tr>
+                    <tr>
+                        <td align="center"> 运维文件编号:</td>
+                        <td>
+                            <input class="easyui-textbox" type="text" name="ID"
+                                   data-options="required:true" readonly="readonly" style="width:300px" />
+                        </td>
+                        <td align="center"> 运维单号:</td>
+                        <td>
+                            <select class="easyui-combobox" name="MaintenanceID" id="MaintenanceID" data-options="required:true" style="width:300px" />
+                        </td>
+
+                    </tr>
+                    <tr>
+                        <td align="center"> 类型:</td>
+                        <td>
+                            <select class="easyui-combobox" name="Type" id="Type" data-options="required:true" style="width:300px" />
+
+                        </td>
+                        <td align="center"> 附件名称:</td>
+                        <td>
+                            <input class="easyui-textbox" type="text" name="FileName"
+                                   style="width:300px" />
+                        </td>
+                    </tr>
+                    <tr>
+                        <td align="center"> 附件类型:</td>
+                        <td>
+                            <input class="easyui-textbox" type="text" name="FilePath"
+                                   style="width:300px" />
+                        </td>
+                        <td align="center"> 状态:</td>
+                        <td>
+                            <select class="easyui-combobox" name="Status" id="Status" data-options="required:true" style="width:300px" />
+                        </td>
+
+                    </tr>
+                    <tr>
+                        <td align="center"> 创建时间:</td>
+                        <td>
+                            <input class="easyui-textbox" type="text" name="CreateDate" data-options="required:true" readonly="readonly" style="width:300px" />
+                        </td>
+                        <td align="center"> 创建人:</td>
+                        <td>
+                            <input class="easyui-textbox" type="text" name="CreatePerson" style="width:300px" />
+                        </td>
+                    </tr>
+                    <tr>
+                        <td align="center"> 修改时间:</td>
+                        <td>
+                            <input class="easyui-textbox" type="text" name="UpdateDate" data-options="required:true" readonly="readonly" style="width:300px" />
+                        </td>
+                        <td align="center"> 修改人:</td>
+                        <td>
+                            <input class="easyui-textbox" type="text" name="UpdatePerson" style="width:300px" />
+                        </td>
+                    </tr>
+                    <tr style="margin-top:100px">
+                        <td align="center">备注:</td>
+                        <td colspan="3">
+                            <input class="easyui-textbox" name="Summary" data-options="multiline:true"
+                                   style="height:60px;width:875px" />
+                        </td>
+                    </tr>
+                </table>
+            </form>
+            <div style="text-align:center;padding:5px;margin-top:50px">
+                <a href="javascript:void(0)" class="easyui-linkbutton" onclick="UpdateForm()">保存</a>
+                <a href="/MaintenanceFiles/Index" class="easyui-linkbutton">返回</a>
+            </div>
+        </div>
+    </div>
+
+    @* Js脚本*@
+    <script>
+
+        //编辑初始化数据
+        $('#Edit').form('load', {
+            ID: '@Model.ID',
+            MaintenanceID: '@Model.MaintenanceID',
+            Type: '@Model.Type',
+            FileName: '@Model.FileName',
+            FilePath: '@Model.FilePath',
+            Status: '@Model.Status',
+            Summary: '@Model.Summary',
+            CreateDate: '@Model.CreateDate',
+            CreatePerson: '@Model.CreatePerson',
+            UpdateDate: '@Model.CreateDate',
+            UpdatePerson: '@Model.UpdatePerson'
+        });
+
+
+
+    
+    //状态
+    $('#Status').combobox({
+      url: '/MaintenanceFiles/GetStatus',
+        textField: 'text',
+        valueField: 'id',
+        panelHeight: 'auto',
+        data: { },
+        method: 'get',
+        onLoadSuccess: function() {
+        var id;
+        if ('@Model.Status' == 'Disabled')
+        {
+            id = 0;
+        }
+        else if ('@Model.Status' == 'Able')
+        {
+            id = 1;
+        }
+        else
+        {
+            id = 1;
+        }
+            $('#Status').combobox('setValue', id);
+    }
+});
+
+    //文件类型
+    $('#Type').combobox({
+     url: '/MaintenanceFiles/GetTypes',
+        textField: 'text',
+        valueField: 'id',
+        panelHeight: 'auto',
+        data: { },
+        method: 'get',
+        onLoadSuccess: function() {
+        var id;
+        if ('@Model.Type' == 'Disabled')
+        {
+            id = 0;
+        }
+        else if ('@Model.Type' == 'Able')
+        {
+            id = 1;
+        }
+        else
+        {
+            id = 1;
+        }
+            $('#Type').combobox('setValue', id);
+    }
+});
+
+
+
+    //运维申请单
+    $('#MaintenanceID').combobox({
+      url: '/MaintenanceFiles/GetMaintenances',
+        textField: 'text',
+        valueField: 'id',
+        panelHeight: 'auto',
+        data: { },
+        method: 'get',
+        onLoadSuccess: function() {
+            $('#MaintenanceID').combobox('setValue', '@Model.MaintenanceID');
+    }
+});
+
+
+                //修改提交
+                    function UpdateForm()
+                    {
+                    $('#Edit').form('submit', {
+                    url: '/MaintenanceFiles/EditByForm/',
+                    onSubmit: function(param) {
+                    param.ID = $('#ID').val();
+                    param.MaintenanceID = $('#MaintenanceID').val();
+                    param.Type = $('#Handler').val();
+                    param.FileName = $('#ItRoleID').val();
+                    param.FilePath = $('#BeginTime').val();
+                    param.Status = $('#Status').val();
+                    param.CreateDate = $('#CreateDate').val();
+                    param.CreatePerson = $('#CreatePerson').val();
+                    param.UpdateDate = $('#UpdateDate').val();
+                    param.UpdatePerson = $('#UpdatePerson').val();
+                    param.Summary = $('#Summary').val();
+
+                    },
+                    success: function(data) {
+                    alert("运维附件信息修改成功！");
+                    window.location.href = "@Url.Action("Index", "MaintenanceFiles")";
+                       }
+                      }
+                      );
+                    }
+
+
+    </script>
+
+
+</body>
+
+
+</html>
+

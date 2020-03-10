@@ -1,0 +1,219 @@
+﻿@model IEnumerable<GyIMS.Models.RequestFormTaskList>
+
+@{
+    ViewBag.Title = "需求任务明细";
+}
+
+@*界面主体*@
+<div>
+
+    <div id="dg-search" margin="0,30,0,30">
+        <label for="RequestFormName">需求名称：</label>
+        <input id="RequestFormName" class="easyui-validatebox" data-options="width:200" />
+
+    </div>
+
+    <table id="dg"></table>
+
+    <div id="dg-button">
+        <a class="easyui-linkbutton" data-options="iconCls:'icon-search'" onclick="Search()">查询</a>
+        <a href="#" class="easyui-linkbutton" data-options="iconCls:'icon-reload'" onclick="Reload()">刷新</a>
+        <a href="javascript:void(0)" class="easyui-linkbutton" data-options="iconCls:'icon-add'" onclick="Add()">添加</a>
+        @*<a href="/RequestFormTaskLists/Create" class="easyui-linkbutton" data-options="iconCls:'icon-add'">添加</a>*@
+        <a href="javascript:void(0)" class="easyui-linkbutton" data-options="iconCls:'icon-edit' " onclick="Edit()">修改</a>
+        <a href="javascript:void(0)" class="easyui-linkbutton" data-options="iconCls:'icon-remove'" onclick="Delete()">删除</a>
+        <a href="/RequestFormTasks/Index/" class="easyui-linkbutton" data-options="iconCls:'icon-back'">返回</a>
+        @*<a href="#" class="easyui-linkbutton" data-options="iconCls:'icon-blank'" onclick="Export()">导出</a>*@
+    </div>
+
+</div>
+
+@*脚本*@
+<script>
+
+    $(function () {
+        $("#dg").datagrid({
+            title: '需求任务明细列表',
+            url: '/RequestFormTaskLists/GetRequestFormTaskListList',
+            queryParams: {RequestFormTaskID: '@ViewBag.RequestFormTaskID'},
+            columns: [[
+                { field: 'RequestFormID', title: '需求申请单号', width: 150, align: 'center' },
+                { field: 'RequestFormName', title: '需求名称', width: 150, align: 'center' },
+                { field: 'RequestFormTaskID', title: '需求任务编号', width: 150, align: 'center' },
+                { field: 'TaskSeqNo', title: '任务序号', width: 150, align: 'center' },
+                { field: 'Handler', title: '处理人', width: 150, align: 'center' },
+                { field: 'HandleDate', title: '处理日期',formatter: function (value, row, index) {
+                          return new Date(parseInt(value.substr(6, 13))).toLocaleDateString();
+                      }, width: 150, align: 'center' },
+                { field: 'FromTime', title: '开始时间',formatter: function (date) {
+                            var pa = /.*\((.*)\)/;
+                            var unixtime = date.match(pa)[1].substring(0,10);
+                            return getTime(unixtime);
+                      }, width: 150, align: 'center' },
+                { field: 'ToTime', title: '结束时间',formatter: function (date) {
+                            var pa = /.*\((.*)\)/;
+                            var unixtime = date.match(pa)[1].substring(0,10);
+                            return getTime(unixtime);
+                      }, width: 150, align: 'center' },
+                { field: 'RateOfProgress', title: '完成比例（0-100）', width: 150, align: 'center' },
+                { field: 'StatusName', title: '状态', width: 60, align: 'center' },
+                {
+                     field: 'CreateDate', title: '创建时间', width: 100, formatter: function (value, row, index) {
+                         return new Date(parseInt(value.substr(6, 13))).toLocaleDateString();
+                     }, align: 'center'
+                 },
+                 { field: 'CreatePerson', title: '创建人', width: 100, align: 'center' },
+                  {
+                      field: 'UpdateDate', title: '修改时间', width: 100, formatter: function (value, row, index) {
+                          return new Date(parseInt(value.substr(6, 13))).toLocaleDateString();
+                      }, align: 'center'
+                  },
+                  { field: 'UpdatePerson', title: '修改人', width: 100, align: 'center' },
+                   { field: 'Summary', title: '备注', width: 100, align: 'center' }
+            ]],
+            toolbar: '#dg-button',
+            singleSelect: true,
+            pagination: true,
+            pageSize: 10,
+            pageList: [10, 20, 30],
+            method: 'get'
+        });
+    })
+
+    //刷新
+    function Reload() {
+        $('#RequestFormName').val("");
+        var queryData = {
+            RequestFormName: $("#RequestFormName").val(),
+            RequestFormTaskID: '@ViewBag.RequestFormTaskID'
+        }
+        InitGrid(queryData);
+    }
+
+    //添加
+    function Add() {
+            window.location.href = "/RequestFormTaskLists/Create?requestFormTaskID=" + '@ViewBag.RequestFormTaskID';
+        }
+
+    //修改
+    function Edit() {
+        var row = $('#dg').datagrid('getSelected');
+        if (row == null) {
+            alert("需要先选择要修改的数据！")
+        }
+        else {
+            window.location.href = "/RequestFormTaskLists/Edit/" + row.ID;
+        }
+
+    };
+
+    //删除
+    function Delete() {
+        var row = $('#dg').datagrid('getSelected');
+        if (row == null) {
+            alert("需要先选择要删除的数据！")
+        }
+        else {
+            if (confirm("你确定要删除该需求任务明细吗？")) {
+                $.ajax({
+                    url: '/RequestFormTaskLists/DeleteByAjax',//地址
+                    dataType: 'text',//返回数据类型
+                    type: 'POST',//类型
+                    data: { id: row.ID },
+                    //请求成功
+                    success: function () {
+                        alert("删除数据成功！");
+                        window.location.href = "/RequestFormTaskLists/Index/"+'@ViewBag.RequestFormTaskID';
+                    }
+                })
+            }
+
+        }
+    }
+
+    //查询
+    function Search() {
+        //得到用户输入的参数，取值有几种方式：$("#id").combobox('getValue'), $("#id").datebox('getValue'), $("#id").val()
+        //字段增加WHC_前缀字符，避免传递如URL这样的Request关键字冲突
+        var queryData = {
+            RequestFormName: $("#RequestFormName").val()
+        }
+        //将值传递给
+        InitGrid(queryData);
+        return false;
+                    RequestFormTaskID:'@ViewBag.RequestFormTaskID'
+
+    }
+
+    //初始化查询数据
+    function InitGrid(queryData) {
+        $("#dg").datagrid({
+            title: '需求任务明细列表',
+            url: '/RequestFormTaskLists/GetRequestFormTaskListList',
+            queryParams: queryData,
+            columns: [[
+                { field: 'RequestFormID', title: '需求申请单号', width: 150, align: 'center' },
+                { field: 'RequestFormName', title: '需求名称', width: 150, align: 'center' },
+                { field: 'RequestFormTaskID', title: '需求任务编号', width: 150, align: 'center' },
+                { field: 'TaskSeqNo', title: '任务序号', width: 150, align: 'center' },
+                { field: 'Handler', title: '处理人', width: 150, align: 'center' },
+                { field: 'HandleDate', title: '处理日期',formatter: function (value, row, index) {
+                          return new Date(parseInt(value.substr(6, 13))).toLocaleDateString();
+                      }, width: 150, align: 'center' },
+                { field: 'FromTime', title: '开始时间',formatter: function (date) {
+                            var pa = /.*\((.*)\)/;
+                            var unixtime = date.match(pa)[1].substring(0,10);
+                            return getTime(unixtime);
+                      }, width: 150, align: 'center' },
+                { field: 'ToTime', title: '结束时间',formatter: function (date) {
+                            var pa = /.*\((.*)\)/;
+                            var unixtime = date.match(pa)[1].substring(0,10);
+                            return getTime(unixtime);
+                      }, width: 150, align: 'center' },
+                { field: 'RateOfProgress', title: '完成比例（0-100）', width: 150, align: 'center' },
+                 { field: 'StatusName', title: '状态', width: 60, align: 'center' },
+                 {
+                     field: 'CreateDate', title: '创建时间', width: 100, formatter: function (value, row, index) {
+                         return new Date(parseInt(value.substr(6, 13))).toLocaleDateString();
+                     }, align: 'center'
+                 },
+                 { field: 'CreatePerson', title: '创建人', width: 100, align: 'center' },
+                  {
+                      field: 'UpdateDate', title: '修改时间', width: 100, formatter: function (value, row, index) {
+                          return new Date(parseInt(value.substr(6, 13))).toLocaleDateString();
+                      }, align: 'center'
+                  },
+                  { field: 'UpdatePerson', title: '修改人', width: 100, align: 'center' },
+                   { field: 'Summary', title: '备注', width: 100, align: 'center' }
+            ]],
+            toolbar: '#dg-button',
+            singleSelect: true,
+            pagination: true,
+            pageSize: 10,
+            pageList: [10, 20, 30],
+            method: 'get'
+        });
+    }
+
+    //日期格式转换
+    function GetDateFormat(str) {
+        return new Date(parseInt(str.substr(6, 13))).toLocaleDateString();
+    }
+
+    function getTime(/** timestamp=0 **/) {
+            var ts = arguments[0] || 0;
+            var t, y, m, d, h, i, s;
+            t = ts ? new Date(ts * 1000) : new Date();
+            y = t.getFullYear();
+            m = t.getMonth() + 1;
+            d = t.getDate();
+            h = t.getHours();
+            i = t.getMinutes();
+            s = t.getSeconds();
+            // 可根据需要在这里定义时间格式  
+            return y + '-' + (m < 10 ? '0' + m : m) + '-' + (d < 10 ? '0' + d : d) + ' ' + (h < 10 ? '0' + h : h) + ':' + (i < 10 ? '0' + i : i) + ':' + (s < 10 ? '0' + s : s);
+        }
+
+</script>
+
+

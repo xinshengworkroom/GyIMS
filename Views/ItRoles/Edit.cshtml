@@ -1,0 +1,155 @@
+﻿@model GyIMS.Models.ItRole
+
+
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>IT角色信息编辑</title>
+</head>
+
+<body>
+    <div style="margin:20px 0;"></div>
+
+    <div class="easyui-panel" title="IT角色信息编辑" style="width:100%;height:100%">
+        <div>
+            <form id="Edit" method="post" style="width:100%;height:100%">
+                <table style="width:100%;height:100%" cellpadding="10" cellspacing="50">
+                    <tr>
+                        <th width="20%"></th>
+                        <th width="30%"></th>
+                        <th width="20%"></th>
+                        <th width="30%"></th>
+                    </tr>
+                    <tr>
+                        <td align="center">角色编号:</td>
+                        <td>
+                            <input class="easyui-textbox" type="text" name="ID"
+                                   data-options="required:true" readonly="readonly" style="width:300px" />
+                        </td>
+                        <td align="center">角色名称:</td>
+                        <td>
+                            <input class="easyui-textbox" type="text" name="Name"
+                                   data-options="required:true" style="width:300px" />
+                        </td>
+
+                    </tr>
+                    <tr>
+                        <td align="center">角色编码:</td>
+                        <td>
+                            <input class="easyui-textbox" type="text" name="Code"  style="width:300px" />
+                        </td>
+                        <td align="center">状态:</td>
+                        <td>
+                            <select class="easyui-combobox" name="Status" id="Status" data-options="required:true"
+                                    style="width:300px" />
+                        </td>
+                    </tr>
+
+                    <tr>
+                        <td align="center">按天成本（每人每天单价）:</td>
+                        <td>
+                            <input class="easyui-textbox" type="text" name="DayCost" style="width:300px" />
+                        </td>
+                        <td align="center">按时成本（每人每小时单价）:</td>
+                        <td>
+                            <input class="easyui-textbox" type="text" name="HourCost"  style="width:300px" />
+                        </td>
+                    </tr>
+                    <tr>
+                        <td align="center">按分成本（每人每分单价）:</td>
+                        <td>
+                            <input class="easyui-textbox" type="text" name="MinuteCost"  style="width:300px" />
+                        </td>
+                        <td align="center">按次计费价格:</td>
+                        <td>
+                            <input class="easyui-textbox" type="text" name="NumCost"  style="width:300px" />
+                        </td>
+                    </tr>
+
+                </table>
+            </form>
+            <div style="text-align:center;padding:5px;margin-top:50px">
+                <a href="javascript:void(0)" class="easyui-linkbutton" onclick="UpdateForm()">保存</a>
+                <a href="/ItRoles/Index" class="easyui-linkbutton">返回</a>
+            </div>
+        </div>
+    </div>
+
+
+
+    <script>
+
+    //新增初始化数据
+    $('#Edit').form('load', {
+        ID: '@Model.ID',
+        Name: '@Model.Name',
+        Code: '@Model.Code',
+        DayCost: '@Model.DayCost',
+        Status: '@Model.Status',
+        HourCost: '@Model.HourCost',
+        MinuteCost: '@Model.MinuteCost',
+        NumCost: '@Model.NumCost',
+        
+    });
+
+
+
+    $('#Status').combobox({
+        url: '/ItRoles/GetItRoleStatus',
+        textField: 'text',
+        valueField: 'id',
+        panelHeight: 'auto',
+        data: {},
+        method: 'get',
+        onLoadSuccess: function () {
+            var id;
+            if ('@Model.Status' == 'Disabled') {
+                id = 0;
+            }
+            else if ('@Model.Status' == 'Able') {
+                id = 1;
+            }
+            $('#Status').combobox('setValue', id);
+        }
+    })
+
+
+    //修改提交
+    function UpdateForm() {
+        $('#Edit').form('submit', {
+            url: '/ItRoles/EditByForm/',
+                            dataType:"json",
+
+            onSubmit: function (param) {
+                param.ID = $('#ID').val();
+                param.Name = $('#Name').val();
+                param.Code = $('#Code').val();
+                param.DayCost = $('#DayCost').val();
+                param.Status = $('#Status').val();
+                param.HourCost = $('#HourCost').val();
+                param.MinuteCost = $('#MinuteCost').val();
+                param.NumCost = $('#NumCost').val();
+                
+
+            },
+            success: function (data) {
+                data = JSON.parse(data);
+                alert(data.Message);
+                if (data.Code == 1) {
+                    window.location.href = "@Url.Action("Index", "ItRoles")";
+                }
+            }
+        }
+        );
+    }
+
+
+
+
+
+    </script>
+</body>
+
+</html>
+

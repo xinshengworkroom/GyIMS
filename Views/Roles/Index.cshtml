@@ -1,0 +1,154 @@
+﻿@model IEnumerable<GyIMS.Models.Role>
+
+
+@{
+    ViewBag.Title = "角色信息";
+}
+
+@*界面主体*@
+<div>
+
+    <div id="dg-search" margin="0,30,0,30">
+        <label for="Name">角色名称：</label>
+        <input id="Name" class="easyui-validatebox" data-options="width:200" />
+    </div>
+
+    <table id="dg"></table>
+
+    <div id="dg-button">
+        <a class="easyui-linkbutton" data-options="iconCls:'icon-search'" onclick="Search()">查询</a>
+        <a href="#" class="easyui-linkbutton" data-options="iconCls:'icon-reload'" onclick="Reload()">刷新</a>
+        <a href="/Roles/Create" class="easyui-linkbutton" data-options="iconCls:'icon-add'">添加</a>
+        <a href="javascript:void(0)" class="easyui-linkbutton" data-options="iconCls:'icon-edit' " onclick="Edit()">修改</a>
+        <a href="javascript:void(0)" class="easyui-linkbutton" data-options="iconCls:'icon-edit' " onclick="Grant()">授权</a>
+        <a href="javascript:void(0)" class="easyui-linkbutton" data-options="iconCls:'icon-remove'" onclick="Delete()">删除</a>
+        @*<a href="#" class="easyui-linkbutton" data-options="iconCls:'icon-blank'" onclick="Export()">导出</a>*@
+    </div>
+
+</div>
+
+@*脚本*@
+<script>
+
+        $(function () {
+            $("#dg").datagrid({
+                title: '角色信息列表',
+                url: '/Roles/GetRoleList',
+                queryParams: "",
+                columns: [[
+                     { field: 'ID', title: '角色编号', width: 100, align: 'center' },
+                     { field: 'Name', title: '角色名称', width: 150, align: 'center' },
+                     { field: 'ChineseName', title: '中文名称', width: 150, align: 'center' },
+                     { field: 'EnglishName', title: '英文名称', width: 150, align: 'center' },
+                     { field: 'StatusName', title: '状态', width: 60, align: 'center' },
+                     { field: 'CreateDate', title: '创建时间', width: 100, formatter: getdate, align: 'center' },
+                     { field: 'CreatePerson', title: '创建人', width: 100, align: 'center' },
+                     { field: 'UpdateDate', title: '修改时间', width: 100, formatter: getdate, align: 'center' },
+                     { field: 'UpdatePerson', title: '修改人', width: 100, align: 'center' },
+                     { field: 'Summary', title: '备注', width: 100, align: 'center' }
+                ]],
+                toolbar: '#dg-button',
+                singleSelect: true,
+                pagination: true,
+                pageSize: 10,
+                pageList: [10, 20, 30],
+                method: 'get'
+            });
+        })
+
+        //刷新
+        function Reload() {
+            $('#Name').val("");
+            InitGrid("");
+        }
+
+        //修改
+        function Edit() {
+            var row = $('#dg').datagrid('getSelected');
+            if (row == null) {
+                alert("需要先选择要修改的数据！")
+            }
+            else {
+                window.location.href = "/Roles/Edit/" + row.ID;
+            }
+
+        };
+
+        //授权
+        function Grant() {
+            var row = $('#dg').datagrid('getSelected');
+            if (row == null) {
+                alert("需要先选择要授权的数据！")
+            }
+            else {
+                window.location.href = "/Roles/RoleGrant/" + row.ID;
+            }
+
+        };
+
+        //删除
+        function Delete() {
+            var row = $('#dg').datagrid('getSelected');
+            if (row == null) {
+                alert("需要先选择要删除的数据！")
+            }
+            else {
+                if (confirm("你确定要删除该角色信息吗？")) {
+                    $.ajax({
+                        url: '/Roles/DeleteByAjax',//地址
+                        dataType: 'text',//返回数据类型
+                        type: 'POST',//类型
+                        data: { id: row.ID },
+                        //请求成功
+                        success: function () {
+                            alert("删除数据成功！");
+                            window.location.href = "/Roles/Index/";
+                        }
+                    })
+                }
+
+            }
+        }
+
+        //查询
+        function Search() {
+            //得到用户输入的参数，取值有几种方式：$("#id").combobox('getValue'), $("#id").datebox('getValue'), $("#id").val()
+            //字段增加WHC_前缀字符，避免传递如URL这样的Request关键字冲突
+            var queryData = {
+                Name: $("#Name").val()
+            }
+            //将值传递给
+            InitGrid(queryData);
+            return false;
+        }
+
+        //初始化查询数据
+        function InitGrid(queryData) {
+            $("#dg").datagrid({
+                title: '角色信息列表',
+                url: '/Roles/GetRoleList',
+                queryParams: queryData,
+                columns: [[
+                    { field: 'ID', title: '角色编号', width: 100, align: 'center' },
+                     { field: 'Name', title: '角色名称', width: 150, align: 'center' },
+                     { field: 'ChineseName', title: '中文名称', width: 150, align: 'center' },
+                     { field: 'EnglishName', title: '英文名称', width: 150, align: 'center' },
+                     { field: 'StatusName', title: '状态', width: 60, align: 'center' },
+                     { field: 'CreateDate', title: '创建时间', width: 100, formatter: getdate, align: 'center' },
+                     { field: 'CreatePerson', title: '创建人', width: 100, align: 'center' },
+                     { field: 'UpdateDate', title: '修改时间', width: 100, formatter: getdate, align: 'center' },
+                     { field: 'UpdatePerson', title: '修改人', width: 100, align: 'center' },
+                     { field: 'Summary', title: '备注', width: 100, align: 'center' }
+                ]],
+                toolbar: '#dg-button',
+                singleSelect: true,
+                pagination: true,
+                pageSize: 10,
+                pageList: [10, 20, 30],
+                method: 'get'
+            });
+        }
+
+        
+</script>
+

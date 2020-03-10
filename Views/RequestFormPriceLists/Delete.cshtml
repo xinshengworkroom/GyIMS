@@ -1,0 +1,128 @@
+﻿@model GyIMS.Models.RequestFormPriceList
+
+@{
+    ViewBag.Title = "Delete";
+}
+
+<h2>Delete</h2>
+
+<h3>Are you sure you want to delete this?</h3>
+<div>
+    <h4>RequestFormPriceList</h4>
+    <hr />
+    <dl class="dl-horizontal">
+        <dt>
+            @Html.DisplayNameFor(model => model.ItRole.Code)
+        </dt>
+
+        <dd>
+            @Html.DisplayFor(model => model.ItRole.Code)
+        </dd>
+
+        <dt>
+            @Html.DisplayNameFor(model => model.RequestForm.Code)
+        </dt>
+
+        <dd>
+            @Html.DisplayFor(model => model.RequestForm.Code)
+        </dd>
+
+        <dt>
+            @Html.DisplayNameFor(model => model.UserCreate.Code)
+        </dt>
+
+        <dd>
+            @Html.DisplayFor(model => model.UserCreate.Code)
+        </dd>
+
+        <dt>
+            @Html.DisplayNameFor(model => model.UserUpdate.Code)
+        </dt>
+
+        <dd>
+            @Html.DisplayFor(model => model.UserUpdate.Code)
+        </dd>
+
+        <dt>
+            @Html.DisplayNameFor(model => model.Offerer)
+        </dt>
+
+        <dd>
+            @Html.DisplayFor(model => model.Offerer)
+        </dd>
+
+        <dt>
+            @Html.DisplayNameFor(model => model.OfferDate)
+        </dt>
+
+        <dd>
+            @Html.DisplayFor(model => model.OfferDate)
+        </dd>
+
+        <dt>
+            @Html.DisplayNameFor(model => model.WorkType)
+        </dt>
+
+        <dd>
+            @Html.DisplayFor(model => model.WorkType)
+        </dd>
+
+        <dt>
+            @Html.DisplayNameFor(model => model.TimeUnit)
+        </dt>
+
+        <dd>
+            @Html.DisplayFor(model => model.TimeUnit)
+        </dd>
+
+        <dt>
+            @Html.DisplayNameFor(model => model.SpendTime)
+        </dt>
+
+        <dd>
+            @Html.DisplayFor(model => model.SpendTime)
+        </dd>
+
+        <dt>
+            @Html.DisplayNameFor(model => model.Status)
+        </dt>
+
+        <dd>
+            @Html.DisplayFor(model => model.Status)
+        </dd>
+
+        <dt>
+            @Html.DisplayNameFor(model => model.CreateDate)
+        </dt>
+
+        <dd>
+            @Html.DisplayFor(model => model.CreateDate)
+        </dd>
+
+        <dt>
+            @Html.DisplayNameFor(model => model.UpdateDate)
+        </dt>
+
+        <dd>
+            @Html.DisplayFor(model => model.UpdateDate)
+        </dd>
+
+        <dt>
+            @Html.DisplayNameFor(model => model.Summary)
+        </dt>
+
+        <dd>
+            @Html.DisplayFor(model => model.Summary)
+        </dd>
+
+    </dl>
+
+    @using (Html.BeginForm()) {
+        @Html.AntiForgeryToken()
+
+        <div class="form-actions no-color">
+            <input type="submit" value="Delete" class="btn btn-default" /> |
+            @Html.ActionLink("Back to List", "Index")
+        </div>
+    }
+</div>

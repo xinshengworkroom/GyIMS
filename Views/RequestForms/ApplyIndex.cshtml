@@ -1,0 +1,444 @@
+﻿@model IEnumerable<GyIMS.Models.RequestForm>
+
+
+@{
+    ViewBag.Title = "需求单信息";
+}
+
+@*界面主体*@
+<div>
+
+    <div id="dg-search" margin="0,30,0,30">
+        <label for="RequestFormName">需求单号：</label>
+        <input id="RequestFormName" class="easyui-validatebox" data-options="width:200" />
+    </div>
+
+    <table id="dg"></table>
+
+    <div id="dg-button">
+        <a class="easyui-linkbutton" data-options="iconCls:'icon-search'" onclick="Search()">查询</a>
+        <a href="#" class="easyui-linkbutton" data-options="iconCls:'icon-reload'" onclick="Reload()">刷新</a>
+        @*<a href="/RequestForms/Create" class="easyui-linkbutton" data-options="iconCls:'icon-add'">添加</a>*@
+        <a href="javascript:void(0)" class="easyui-linkbutton" data-options="iconCls:'icon-edit' " onclick="Edit()">修改</a>
+        <a href="javascript:void(0)" class="easyui-linkbutton" data-options="iconCls:'icon-redo' " onclick="Apply()">申请</a>
+        <a href="javascript:void(0)" class="easyui-linkbutton" data-options="iconCls:'icon-tip' " onclick="Price()">报价</a>
+        <a href="javascript:void(0)" class="easyui-linkbutton" data-options="iconCls:'icon-ok' " onclick="Sure()">确认报价</a>
+        <a href="javascript:void(0)" class="easyui-linkbutton" data-options="iconCls:'icon-back' " onclick="Return()">退回</a>
+        <a href="javascript:void(0)" class="easyui-linkbutton" data-options="iconCls:'icon-cancel' " onclick="Cancel()">取消</a>
+        <a href="javascript:void(0)" class="easyui-linkbutton" data-options="iconCls:'icon-save' " onclick="Order()">接单</a>
+        <a href="javascript:void(0)" class="easyui-linkbutton" data-options="iconCls:'icon-man' " onclick="Resolve()">分解任务</a>
+        <a href="javascript:void(0)" class="easyui-linkbutton" data-options="iconCls:'icon-print' " onclick="Develop()">开发</a>
+        <a href="javascript:void(0)" class="easyui-linkbutton" data-options="iconCls:'icon-filter' " onclick="Test()">测试</a>
+        <a href="javascript:void(0)" class="easyui-linkbutton" data-options="iconCls:'icon-mini-add' " onclick="Check()">验收</a>
+        <a href="javascript:void(0)" class="easyui-linkbutton" data-options="iconCls:'icon-remove'" onclick="Delete()">删除</a>
+        @*<a href="#" class="easyui-linkbutton" data-options="iconCls:'icon-blank'" onclick="Export()">导出</a>*@
+    </div>
+
+</div>
+
+@*脚本*@
+<script>
+
+    $(function () {
+                $("#dg").datagrid({
+                    title: '需求申请信息列表',
+                    url: '/RequestForms/GetRequestFormApplyList',
+                    queryParams: "",
+                    columns: [[
+                        { field: 'ID', title: '需求申请单号', width: 100, align: 'center' },
+                        { field: 'Code', title: '单号', width: 150, align: 'center' },
+                        { field: 'Name', title: '需求名称', width: 150, align: 'center' },
+                        { field: 'SysTypeName', title: '系统类型', width: 150, align: 'center' },
+                        { field: 'Description', title: '需求描述', width: 150, align: 'center' },
+                        { field: 'Applier', title: '需求申请人', width: 150, align: 'center' },
+                        { field: 'RequestStatusName', title: '需求状态', width: 150, align: 'center' },
+                        { field: 'StatusName', title: '状态', width: 60, align: 'center' },
+                        {
+                            field: 'CreateDate', title: '创建时间', width: 100, formatter: function (value, row, index) {
+                                return new Date(parseInt(value.substr(6, 13))).toLocaleDateString();
+                            }, align: 'center'
+                        },
+                        { field: 'CreatePersonName', title: '创建人', width: 100, align: 'center' },
+                        {
+                            field: 'UpdateDate', title: '修改时间', width: 100, formatter: function (value, row, index) {
+                                return new Date(parseInt(value.substr(6, 13))).toLocaleDateString();
+                            }, align: 'center'
+                        },
+                        { field: 'UpdatePersonName', title: '修改人', width: 100, align: 'center' },
+                        { field: 'Summary', title: '备注', width: 100, align: 'center' }
+                    ]],
+            toolbar: '#dg-button',
+            singleSelect: true,
+            pagination: true,
+            pageSize: 10,
+            pageList: [10, 20, 30],
+            method: 'get'
+        });
+    })
+
+    //刷新
+    function Reload() {
+        $('#RequestFormName').val("");
+        InitGrid("");
+    }
+
+    //修改
+    function Edit() {
+        var row = $('#dg').datagrid('getSelected');
+        if (row == null) {
+            alert("需要先选择要修改的数据！")
+        }
+        else {
+            window.location.href = "/RequestForms/Edit/" + row.ID;
+        }
+
+    };
+
+    //删除
+    function Delete() {
+        var row = $('#dg').datagrid('getSelected');
+        if (row == null) {
+            alert("需要先选择要删除的数据！")
+        }
+        else {
+            if (confirm("你确定要删除该需求申请单信息吗？")) {
+                $.ajax({
+                    url: '/RequestForms/DeleteByAjax',//地址
+                    dataType: 'text',//返回数据类型
+                    type: 'POST',//类型
+                    data: { id: row.ID },
+                    //请求成功
+                    success: function () {
+                        alert("删除数据成功！");
+                        window.location.href = "/RequestForms/ApplyIndex/";
+                    }
+                })
+            }
+
+        }
+    }
+
+    //草稿
+    function Draft() {
+        var row = $('#dg').datagrid('getSelected');
+        if (row == null) {
+            alert("需要先选择要编辑的数据！")
+        }
+        else {
+            if (confirm("你确定要编辑该需求申请单信息吗？")) {
+                $.ajax({
+                    url: '/RequestForms/DraftByAjax',//地址
+                    dataType: 'text',//返回数据类型
+                    type: 'POST',//类型
+                    data: { id: row.ID },
+                    //请求成功
+                    success: function () {
+                        alert("编辑数据成功！");
+                        window.location.href = "/RequestForms/ApplyIndex/";
+                    }
+                })
+            }
+
+        }
+    }
+
+    //申请
+            function Apply() {
+                var row = $('#dg').datagrid('getSelected');
+                if (row == null) {
+                    alert("需要先选择要申请的数据！")
+                }
+                else {
+                    if (confirm("你确定要申请该需求申请单信息吗？")) {
+                        $.ajax({
+                            url: '/RequestForms/ApplyByAjax',//地址
+                            dataType: 'text',//返回数据类型
+                            type: 'POST',//类型
+                            data: { id: row.ID },
+                            //请求成功
+                            success: function () {
+                                alert("申请数据成功！");
+                                window.location.href = "/RequestForms/ApplyIndex/";
+                            }
+                        })
+                    }
+
+                }
+            }
+
+            //报价
+            function Price() {
+                var row = $('#dg').datagrid('getSelected');
+                if (row == null) {
+                    alert("需要先选择要报价的数据！")
+                }
+                else {
+                    if (confirm("你确定要对该需求申请单报价吗？")) {
+                        $.ajax({
+                            url: '/RequestForms/PriceByAjax',//地址
+                            dataType: 'text',//返回数据类型
+                            type: 'POST',//类型
+                            data: { id: row.ID },
+                            //请求成功
+                            success: function () {
+                                alert("报价成功！");
+                                window.location.href = "/RequestForms/ApplyIndex/";
+                            }
+                        })
+                    }
+
+                }
+            }
+
+            //确认报价
+            function Sure() {
+                var row = $('#dg').datagrid('getSelected');
+                if (row == null) {
+                    alert("需要先选择要确认报价的数据！")
+                }
+                else {
+                    if (confirm("你确定要确认该需求申请单信息报价吗？")) {
+                        $.ajax({
+                            url: '/RequestForms/SureByAjax',//地址
+                            dataType: 'text',//返回数据类型
+                            type: 'POST',//类型
+                            data: { id: row.ID },
+                            //请求成功
+                            success: function () {
+                                alert("确认报价成功！");
+                                window.location.href = "/RequestForms/ApplyIndex/";
+                            }
+                        })
+                    }
+
+                }
+            }
+
+            //退回
+            function Return() {
+                var row = $('#dg').datagrid('getSelected');
+                if (row == null) {
+                    alert("需要先选择要退回的数据！")
+                }
+                else {
+                    if (confirm("你确定要退回该需求申请单信息吗？")) {
+                        $.ajax({
+                            url: '/RequestForms/ReturnByAjax',//地址
+                            dataType: 'text',//返回数据类型
+                            type: 'POST',//类型
+                            data: { id: row.ID },
+                            //请求成功
+                            success: function () {
+                                alert("退回数据成功！");
+                                window.location.href = "/RequestForms/ApplyIndex/";
+                            }
+                        })
+                    }
+
+                }
+            }
+
+            //取消
+            function Cancel() {
+                var row = $('#dg').datagrid('getSelected');
+                if (row == null) {
+                    alert("需要先选择要取消的数据！")
+                }
+                else {
+                    if (confirm("你确定要取消该需求申请单信息吗？")) {
+                        $.ajax({
+                            url: '/RequestForms/CancelByAjax',//地址
+                            dataType: 'text',//返回数据类型
+                            type: 'POST',//类型
+                            data: { id: row.ID },
+                            //请求成功
+                            success: function () {
+                                alert("取消数据成功！");
+                                window.location.href = "/RequestForms/ApplyIndex/";
+                            }
+                        })
+                    }
+
+                }
+            }
+
+            //接单
+            function Order() {
+                var row = $('#dg').datagrid('getSelected');
+                if (row == null) {
+                    alert("需要先选择要接单的数据！")
+                }
+                else {
+                    if (confirm("你确定要对该需求申请单信息接单吗？")) {
+                        $.ajax({
+                            url: '/RequestForms/OrderByAjax',//地址
+                            dataType: 'text',//返回数据类型
+                            type: 'POST',//类型
+                            data: { id: row.ID },
+                            //请求成功
+                            success: function () {
+                                alert("接单数据成功！");
+                                window.location.href = "/RequestForms/ApplyIndex/";
+                            }
+                        })
+                    }
+
+                }
+            }
+
+            //分解任务
+            function Resolve() {
+                var row = $('#dg').datagrid('getSelected');
+                if (row == null) {
+                    alert("需要先选择要分解任务的数据！")
+                }
+                else {
+                    if (confirm("你确定要分解该需求申请单信息吗？")) {
+                        $.ajax({
+                            url: '/RequestForms/ResolveByAjax',//地址
+                            dataType: 'text',//返回数据类型
+                            type: 'POST',//类型
+                            data: { id: row.ID },
+                            //请求成功
+                            success: function () {
+                                alert("分解数据成功！");
+                                window.location.href = "/RequestForms/ApplyIndex/";
+                            }
+                        })
+                    }
+
+                }
+            }
+
+            //开发中
+            function Develop() {
+                var row = $('#dg').datagrid('getSelected');
+                if (row == null) {
+                    alert("需要先选择要开发的数据！")
+                }
+                else {
+                    if (confirm("你确定要开发该需求申请单信息吗？")) {
+                        $.ajax({
+                            url: '/RequestForms/DevelopByAjax',//地址
+                            dataType: 'text',//返回数据类型
+                            type: 'POST',//类型
+                            data: { id: row.ID },
+                            //请求成功
+                            success: function () {
+                                alert("数据开发成功！");
+                                window.location.href = "/RequestForms/ApplyIndex/";
+                            }
+                        })
+                    }
+
+                }
+            }
+
+            //测试
+            function Test() {
+                var row = $('#dg').datagrid('getSelected');
+                if (row == null) {
+                    alert("需要先选择要测试的数据！")
+                }
+                else {
+                    if (confirm("你确定要测试该需求申请单信息吗？")) {
+                        $.ajax({
+                            url: '/RequestForms/TestByAjax',//地址
+                            dataType: 'text',//返回数据类型
+                            type: 'POST',//类型
+                            data: { id: row.ID },
+                            //请求成功
+                            success: function () {
+                                alert("测试数据成功！");
+                                window.location.href = "/RequestForms/ApplyIndex/";
+                            }
+                        })
+                    }
+
+                }
+            }
+
+            //验收
+            function Check() {
+                var row = $('#dg').datagrid('getSelected');
+                if (row == null) {
+                    alert("需要先选择要验收的数据！")
+                }
+                else {
+                    if (confirm("你确定要验收该需求申请单信息吗？")) {
+                        $.ajax({
+                            url: '/RequestForms/CheckByAjax',//地址
+                            dataType: 'text',//返回数据类型
+                            type: 'POST',//类型
+                            data: { id: row.ID },
+                            //请求成功
+                            success: function () {
+                                alert("验收数据成功！");
+                                window.location.href = "/RequestForms/ApplyIndex/";
+                            }
+                        })
+                    }
+
+                }
+            }
+
+    //查询
+    function Search() {
+        //得到用户输入的参数，取值有几种方式：$("#id").combobox('getValue'), $("#id").datebox('getValue'), $("#id").val()
+        //字段增加WHC_前缀字符，避免传递如URL这样的Request关键字冲突
+        var queryData = {
+            RequestFormName: $("#RequestFormName").val()
+        }
+        //将值传递给
+        InitGrid(queryData);
+        return false;
+    }
+
+    //初始化查询数据
+            function InitGrid(queryData) {
+                $("#dg").datagrid({
+                    title: '需求申请信息列表',
+                    url: '/RequestForms/GetRequestFormApplyList',
+                    queryParams: queryData,
+                    columns: [[
+                        { field: 'ID', title: '需求申请单号', width: 100, align: 'center' },
+                        { field: 'Code', title: '单号', width: 150, align: 'center' },
+                        { field: 'Name', title: '需求名称', width: 150, align: 'center' },
+                        { field: 'SysTypeName', title: '系统类型', width: 150, align: 'center' },
+                        { field: 'Description', title: '需求描述', width: 150, align: 'center' },
+                        { field: 'Applier', title: '需求申请人', width: 150, align: 'center' },
+                        { field: 'RequestStatusName', title: '需求状态', width: 150, align: 'center' },
+                        { field: 'StatusName', title: '状态', width: 60, align: 'center' },
+                        {
+                            field: 'CreateDate', title: '创建时间', width: 100, formatter: function (value, row, index) {
+                                return new Date(parseInt(value.substr(6, 13))).toLocaleDateString();
+                            }, align: 'center'
+                        },
+                        { field: 'CreatePersonName', title: '创建人', width: 100, align: 'center' },
+                        {
+                            field: 'UpdateDate', title: '修改时间', width: 100, formatter: function (value, row, index) {
+                                return new Date(parseInt(value.substr(6, 13))).toLocaleDateString();
+                            }, align: 'center'
+                        },
+                        { field: 'UpdatePersonName', title: '修改人', width: 100, align: 'center' },
+                        { field: 'Summary', title: '备注', width: 100, align: 'center' }
+                    ]],
+                    toolbar: '#dg-button',
+                    singleSelect: true,
+                    pagination: true,
+                    pageSize: 10,
+                    pageList: [10, 20, 30],
+                    method: 'get'
+                });
+            }
+
+    //日期格式转换
+    function GetDateFormat(str) {
+        return new Date(parseInt(str.substr(6, 13))).toLocaleDateString();
+    }
+
+</script>
+
+
+
+

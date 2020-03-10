@@ -1,0 +1,163 @@
+﻿@model GyIMS.Helper.ViewModel.MenuTitles.ViewMenuTitle
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="UTF-8">
+    <title>层级系统菜单标题新增</title>
+</head>
+
+<body>
+    <div style="margin:20px 0;">
+    </div>
+
+    <div class="easyui-panel" title="层级系统菜单标题新增" style="width:100%;height:100%">
+        <div>
+            <form id="menuhead" method="post" style="width:100%;height:100%">
+                <table style="width:100%;height:100%" cellpadding="10" cellspacing="50">
+                    <tr>
+                        <th width="20%"></th>
+                        <th width="30%"></th>
+                        <th width="20%"></th>
+                        <th width="30%"></th>
+                    </tr>
+                    <tr>
+                        <td align="center">主菜单标题编号:</td>
+                        <td>
+                            <input class="easyui-textbox" type="text" name="MainID" id="MainID"
+                                   data-options="required:true" readonly="readonly" style="width:300px" />
+                        </td>
+                        <td align="center">主菜单标题名称:</td>
+                        <td>
+                            <input class="easyui-textbox" type="text" name="MainTitleName" id="MainTitleName"
+                                   data-options="required:true" readonly="readonly" style="width:300px" />
+                        </td>
+
+
+                    </tr>
+                </table>
+
+
+            </form>
+
+            <br />  <br />
+
+            <form id="menudetails" method="post" style="width:100%;height:100%">
+                <table style="width:100%;height:100%" cellpadding="10" cellspacing="50">
+                    <tr>
+                        <th width="20%"></th>
+                        <th width="30%"></th>
+                        <th width="20%"></th>
+                        <th width="30%"></th>
+                    </tr>
+                    <tr>
+                        <td align="center">菜单标题编号:</td>
+                        <td>
+                            <input class="easyui-textbox" type="text" name="HierID" id="HierID"
+                                   data-options="required:true" readonly="readonly" style="width:300px" />
+                        </td>
+                        <td align="center">菜单标题名称:</td>
+                        <td>
+                            <input class="easyui-textbox" type="text" name="TitleName" id="TitleName"
+                                   data-options="required:true" style="width:300px" />
+                        </td>
+
+                    </tr>
+                    <tr>
+                        <td align="center">序号:</td>
+                        <td>
+                            <input class="easyui-textbox" type="text" name="SN" id="SN" style="width:300px" />
+                        </td>
+                        <td align="center">状态:</td>
+                        <td>
+                            <select class="easyui-combobox" type="text" name="Status" id="Status" data-options="required:true" style="width:300px" />
+                        </td>
+                    </tr>
+
+
+                    <tr>
+                        <td align="center">控制器/视图:</td>
+                        <td>
+                            <input class="easyui-textbox" type="text" name="LoginUrl" id="LoginUrl" data-options="required:true" style="width:300px" />
+                        </td>
+                        <td align="center">菜单等级:</td>
+                        <td>
+                            <select class="easyui-combobox" name="Rank" id="Rank" data-options="required:true" style="width:300px" />
+
+                        </td>
+                    </tr>
+
+                </table>
+            </form>
+
+            <div style="text-align:center;padding:5px;margin-top:50px">
+                <a href="javascript:void(0)" class="easyui-linkbutton" onclick="submitForm()">提交</a>
+                <a href="/MenuTitle/Index" class="easyui-linkbutton">返回</a>
+            </div>
+        </div>
+    </div>
+
+    @*Js脚本*@
+    <script type="text/javascript">
+
+        var formhead = "#menuhead";
+        var formdetails = "#menudetails";
+        $(function () {
+
+            DataJson = new Object();
+            DataJson.FormId = formhead;
+            DataJson.MainID = GetQueryString('mainID');
+            DataJson.MainTitleName = decodeURI(GetQueryString('maintitlename'),"utf-8");
+            GetModelValue(DataJson);
+
+            DataJson = new Object();
+            DataJson.FormId = formdetails;
+            DataJson.HierID = '@Model._MapsMenuTitle.HierID';
+            GetModelValue(DataJson); //界面显示数据
+
+            StatusJson.ID = "#Rank";
+            StatusJson.TableName = "Menus";
+            StatusJson.StatusDesc = "MenuRank";
+            GetStatusType(StatusJson);
+
+            StatusJson.ID = "#Status";
+            StatusJson.TableName = "ALL";
+            StatusJson.StatusDesc = "STATUS";
+            GetStatusType(StatusJson);
+        });
+
+    //新增提交
+        function submitForm() {
+            DataJson = new Object();
+            DataJson.FormId = formdetails;
+            DataJson.Url = '/MenuTitle/CreateByForm/';
+            DataJson.DataType = 'json';
+            DataJson.HierID = $('#HierID').val();
+            DataJson.TitleName = $('#TitleName').val();
+            DataJson.SN = $('#SN').val();
+            DataJson.Status = $('#Status').val();
+            DataJson.Rank = $('#Rank').val();
+            DataJson.LoginUrl = $('#LoginUrl').val();
+            DataJson.MapsTitleID = $('#MainID').val();
+            SubmitModelValue(DataJson);
+
+            
+                DataJson = new Object();
+                DataJson.Url = '/MenuTitle/CreateMenuByForm/';
+                DataJson.DataType = 'json';
+                DataJson.HierID = $('#HierID').val();
+                DataJson.MapsTitleID = $('#MainID').val();
+                DataJson.LoginUrl = $('#LoginUrl').val();
+                DataJson.Href = "@Url.Action("Index", "MenuTitle")";
+                SubmitModelValue(DataJson);
+            
+        }
+
+        function GetQueryString(name) {
+            var reg = new RegExp("(^|&)" + name + "=([^&]*)(&|$)");
+            var r = window.location.search.substr(1).match(reg);
+            if (r != null) return unescape(r[2]); return null;
+        }
+    </script>
+</body>
+</html>

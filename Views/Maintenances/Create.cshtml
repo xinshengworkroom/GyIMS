@@ -1,0 +1,303 @@
+﻿@model GyIMS.Models.Maintenance
+
+
+
+@*<!DOCTYPE html>
+    <html>
+
+    <head>
+        <meta charset="UTF-8">
+        <title>运维申请单-新增</title>
+    </head>*@
+
+@*<body>*@
+<div style="margin:20px 0;"></div>
+
+<div class="easyui-panel" title="运维申请单-新增" style="width:100%;height:100%">
+    <div style="width:100%;height:100%">
+        <form id="Create" method="post">
+            <table style="width:100%;" cellpadding="10" cellspacing="50">
+                <tr>
+                    <th width="20%"></th>
+                    <th width="30%"></th>
+                    <th width="20%"></th>
+                    <th width="30%"></th>
+                </tr>
+                <tr>
+                    <td align="center">运维单号:</td>
+                    <td>
+                        <input class="easyui-textbox" type="text" name="ID"
+                               data-options="required:true" readonly="readonly" style="width:300px" />
+                    </td>
+                    <td align="center">单号:</td>
+                    <td>
+                        <input class="easyui-textbox" type="text" name="Code"
+                               data-options="required:true" style="width: 300px" />
+                    </td>
+
+                </tr>
+                <tr>
+                    <td align="center">申请人:</td>
+                    <td>
+                        <input class="easyui-textbox" type="text" name="Applier"
+                               data-options="required:true" style="width: 300px" />
+                    </td>
+                    <td align="center">区域（申请人所在）:</td>
+                    <td>
+                        <select class="easyui-combobox" name="Region" id="Region" data-options="required:true" style="width:300px" />
+
+                    </td>
+                </tr>
+                <tr>
+                    <td align="center">问题类型:</td>
+                    <td>
+                        <select class="easyui-combobox" name="Type" id="Type" data-options="required:true" style="width:300px" />
+                    </td>
+                    <td align="center">软件系统类型:</td>
+                    <td>
+                        <select class="easyui-combobox" name="SysType" id="SysType" style="width:300px" />
+                    </td>
+
+                </tr>
+                <tr>
+                    <td align="center">硬件系统类型:</td>
+                    <td>
+                        <select class="easyui-combobox" name="HSysType" id="HSysType" style="width:300px" />
+                    </td>
+                    <td align="center">状态:</td>
+                    <td>
+                        <select class="easyui-combobox" name="Status" id="Status" data-options="required:true" style="width:300px" />
+                    </td>
+
+                </tr>
+                <tr>
+                    <td align="center">运维状态:</td>
+                    <td>
+                        <select class="easyui-combobox" name="MaintenanceStatus" id="MaintenanceStatus" data-options="required:true" style="width:300px" />
+                    </td>
+                    <td align="center">上传文件名称:</td>
+                    <td>
+                        <input class="easyui-textbox" type="text" id="FileName" name="FileName"
+                               style="width:300px" />
+                    </td>
+                </tr>
+                <tr>
+
+                    <td align="center">问题名称:</td>
+                    <td>
+                        <input class="easyui-textbox" type="text" name="Name"
+                               style="width:300px" />
+                    </td>
+
+                </tr>
+                <tr>
+                    <td align="center">创建时间:</td>
+                    <td>
+                        <input class="easyui-textbox" type="text" name="CreateDate" data-options="required:true" readonly="readonly" style="width:300px" />
+                    </td>
+                    <td align="center">创建人:</td>
+                    <td>
+                        <input class="easyui-textbox" type="text" name="CreatePerson" style="width:300px" />
+                    </td>
+                </tr>
+                <tr>
+                    <td align="center">修改时间:</td>
+                    <td>
+                        <input class="easyui-textbox" type="text" name="UpdateDate" data-options="required:true" readonly="readonly" style="width:300px" />
+                    </td>
+                    <td align="center">修改人:</td>
+                    <td>
+                        <input class="easyui-textbox" type="text" name="UpdatePerson" style="width:300px" />
+                    </td>
+                </tr>
+                <tr style="margin-top:100px">
+                    <td align="center">问题描述:</td>
+                    <td colspan="3">
+                        <input class="easyui-textbox" name="Description" data-options="multiline:true"
+                               style="height:60px;width:875px" />
+                    </td>
+                </tr>
+                <tr style="margin-top:100px">
+                    <td align="center">备注:</td>
+                    <td colspan="3">
+                        <input class="easyui-textbox" name="Summary" data-options="multiline:true"
+                               style="height:60px;width:875px" />
+                    </td>
+                </tr>
+                <tr>
+                    <td align="center">附件证明:</td>
+                    <td colspan="3">
+                        <input type="file" id="file1" name="file1" />
+                    </td>
+                </tr>
+                <tr>
+                    <td align="center">附件证明:</td>
+                    <td colspan="3">
+                        <input type="file" id="file2" name="file2" />
+                    </td>
+                </tr>
+                <tr>
+                    <td align="center">附件证明:</td>
+                    <td colspan="3">
+                        <input type="file" id="file3" name="file3" />
+                    </td>
+                </tr>
+                <tr>
+                    <td align="center" colspan="4">
+                        <input type="button" value="上传文件" onclick="javascript:upload();" />
+                    </td>
+                </tr>
+                <tr>
+                    <td align="center">相关附件:</td>
+                    <td colspan="3">
+                        <input type="hidden" id="hid_files" />
+                        <div id="files"></div>
+                    </td>
+                </tr>
+            </table>
+        </form>
+        @*<table style="width:100%;" cellpadding="10" cellspacing="50">
+            <tr>
+                <td>附件</td>
+                <td colspan="3">
+                    <form action="@Url.Action("FileUpload","Maintenances",new { area = ""})" method="post" enctype="multipart/form-data">
+                        <input type="file" class="easyui-filebox" name="file" />
+                        <input type="submit" id="btnUpload" value="上传" />
+                    </form>
+
+                </td>
+            </tr>
+        </table>*@
+
+        <div style="text-align:center;padding:5px;margin-top:50px">
+            <a href="@Url.Action("Index","Maintenances",new { area = ""})" class="easyui-linkbutton">返回</a>
+            <a href="javascript:void(0)" class="easyui-linkbutton" onclick="Apply()">保存</a>
+
+        </div>
+    </div>
+</div>
+
+
+@*Js脚本*@
+@section scripts{
+    <script src="~/Scripts/fileUpload.js"></script>
+
+
+    <script type="text/javascript">
+
+    $(function () {
+        //新增初始化数据
+        $('#Create').form('load', {
+            ID: '@Model.ID',
+            CreateDate: '@DateTime.Now',
+            CreatePerson: '@WebContext.Current.SessionUser.ID',
+            UpdateDate: '@DateTime.Now',
+            UpdatePerson: '@WebContext.Current.SessionUser.ID'
+
+        });
+
+        //状态
+        $('#Status').combobox({
+            url: '/Maintenances/GetCommonStatuses',
+            textField: 'text',
+            valueField: 'id',
+            panelHeight: 'auto',
+            data: {},
+            method: 'get',
+            onLoadSuccess: function () {
+                $('#Status').combobox('setValue', '@Model.StatusName');
+            }
+        });
+
+        //问题状态
+        StatusJson.ID = "#MaintenanceStatus";
+        StatusJson.TableName = "Maintenances";
+        StatusJson.StatusDesc = "MTStatus";
+        GetStatusType(StatusJson);
+
+        //问题类型
+        StatusJson.ID = "#Type";
+        StatusJson.TableName = "Maintenances";
+        StatusJson.StatusDesc = "MTypes";
+        GetStatusType(StatusJson);
+
+        //软件问题类型
+        StatusJson.ID = "#SysType";
+        StatusJson.TableName = "Maintenances";
+        StatusJson.StatusDesc = "MtSysType";
+        GetStatusType(StatusJson);
+
+        //硬件问题类型
+        StatusJson.ID = "#HSysType";
+        StatusJson.TableName = "Maintenances";
+        StatusJson.StatusDesc = "MTHSysType";
+        GetStatusType(StatusJson);
+
+        //区域
+        StatusJson.ID = "#Region";
+        StatusJson.TableName = "Maintenances";
+        StatusJson.StatusDesc = "Region";
+        GetStatusType(StatusJson);
+    });
+
+
+
+
+    //新增提交
+    function Apply() {
+        //$('#MaintenanceStatus').combobox('setValue','SI20200099')
+         $('#Create').form('submit', {
+            url: '/Maintenances/CreateByForm/',
+             dataType:"json",
+            onSubmit: function (param) {
+                param.ID = $('#ID').val();
+                param.Code = $('#Code').val();
+                param.Applier = $('#Applier').val();
+                param.Region = $('#Region').val();
+                param.Type = $('#Type').val();
+                param.SysType = $('#SysType').val();
+                param.HSysType = $('#HSysType').val();
+                param.Name = $('#Name').val();
+                param.FileName = $("#hid_files").val();//$('#FileName').val();
+                param.Description = $('#Description').val();
+                param.Status = $('#Status').val();
+                param.MaintenanceStatus = $('#MaintenanceStatus').val();
+                param.CreateDate = $('#CreateDate').val();
+                param.CreatePerson = $('#CreatePerson').val();
+                param.UpdateDate = $('#UpdateDate').val();
+                param.UpdatePerson = $('#UpdatePerson').val();
+                param.Summary = $('#Summary').val();
+
+            },
+            success: function (data) {
+                    data = JSON.parse(data);
+                    alert(data.Message);
+                    if (data.Code == 1) {
+                        window.location.href = "@Url.Action("Index", "Maintenances")";
+                    }
+                }
+            });
+        }
+
+
+        function upload() {
+            fileUpload($("input[type='file']"), {}, "@Url.Action("FileUpload")",
+                function (result) {
+                    if (result) {
+                        var files = [];
+                        $.each(result.FileNames, function (index, value) {
+                            $("#files").append("<a target='_blank' title='点击下载该文件' href='@Url.Action("FileDownload", "Maintenances", new { area = "" })?filename=" + value + "'>" + value + "</a><br/>");
+                            files.push(value);
+                        });
+                        $('#FileName').textbox("setValue",files.join(","))
+                        $("#hid_files").val(files.join(","));
+                    }
+                },
+                function (err) {
+                });
+        }
+    </script>
+}
+@*</body>
+    </html>*@
+

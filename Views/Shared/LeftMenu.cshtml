@@ -1,0 +1,273 @@
+﻿@*@model IEnumerable<GyFMS.Models.User>*@
+<!-- Left panel : Navigation area -->
+<!-- Note: This width of the aside area can be adjusted through LESS variables -->
+@*动态easyui-tree 生成*@
+<ul class="easyui-tree" id="tree"> </ul>
+<script>
+    
+    $('#tree').tree({
+        url: '/MenuTitle/GetTreeMenu?Userid=-1',//向后台传送用户id,获取根节点
+        lins: true,
+        async: false,
+        onClick: function (node) {                      //节点的点击事件
+            console.log(node);
+            window.location.href = "/" + node.url + "/";
+        }
+    })
+
+</script>
+
+
+
+
+
+    @*<ul class="easyui-tree">
+        <li>
+            <span>系统管理</span>
+            <ul>
+
+                <li>
+                    <a href="@Url.Action("Index", "MenuTitle")"><span>系统菜单标题设定</span></a>
+                </li>
+
+                <li>
+                    <a href="@Url.Action("Index","Menus")"><span>系统菜单设定</span></a>
+                </li>
+                <li>
+                    <a href="@Url.Action("Index","Users")"><span>用户管理</span></a>
+                </li>
+                <li>
+                    <a href="@Url.Action("Index","Roles")"><span>角色管理</span></a>
+                </li>
+                <li>
+                    <a href="@Url.Action("GrantIndex","Users")"><span>用户授权</span></a>
+                </li>
+
+            </ul>
+        </li>
+        <li>
+            <span>业务设置</span>
+            <ul>
+                <li>
+                    <a href="@Url.Action("Index","FeeTypes")"><span>费用类型管理</span></a>
+                </li>
+                <li>
+                    <a href="@Url.Action("Index","ItRoles")"><span>IT角色管理</span></a>
+                </li>
+                <li>
+                    <a href="@Url.Action("Index","Contacts")"><span>联系人管理</span></a>
+                </li>
+                <li>
+                    <a href="@Url.Action("Index","Banks")"><span>银行账户管理</span></a>
+                </li>
+            </ul>
+        </li>
+        <li>
+            <span>运维管理</span>
+            <ul>
+                <li>
+                    <a href="@Url.Action("Index","Maintenances")"><span>运维申请</span></a>
+                </li>
+                <li>
+                    <a href="@Url.Action("ApplyIndex", "Maintenances")"><span>运维待接单</span></a>
+                </li>
+                <li>
+                    <a href="@Url.Action("AcceptIndex", "Maintenances")"><span>运维待处理</span></a>
+                </li>
+                <li>
+                    <a href="@Url.Action("HandleIndex", "Maintenances")"><span>运维处理中</span></a>
+                </li>
+                <li>
+                    <a href="@Url.Action("EndIndex", "Maintenances")"><span>运维待结案</span></a>
+                </li>
+            </ul>
+        </li>
+
+        <li>
+            <span>运维状态</span>
+            <ul>
+                <li>
+                    <a href="@Url.Action("ApplyIndex","Maintenances")"><span>运维申请</span></a>
+                </li>
+                <li>
+                    <a href="@Url.Action("AcceptIndex","Maintenances")"><span>运维待接单</span></a>
+                </li>
+                <li>
+                    <a href="@Url.Action("HandleIndex","Maintenances")"><span>运维待处理</span></a>
+                </li>
+                <li>
+                    <a href="@Url.Action("EndIndex","Maintenances")"><span>运维处理中</span></a>
+                </li>
+                <li>
+                    <a href="@Url.Action("ReturnIndex","Maintenances")"><span>运维待结案</span></a>
+                </li>
+
+                <li>
+                    <a href="@Url.Action("HangIndex","Maintenances")"><span>运维挂起</span></a>
+                </li>
+
+            </ul>
+        </li>
+        <li>
+            <span>需求管理</span>
+            <ul>
+                <li>
+                    <a href="@Url.Action("Index","RequestForms")"><span>需求申请</span></a>
+                </li>
+                <li>
+                    <a href="@Url.Action("Index", "RequestFormFiles")"><span>上传附件</span></a>
+                </li>
+                <li>
+                    <a href="@Url.Action("Index", "RequestFormAssessments")"><span>需求评估报价</span></a>
+                </li>
+                <li>
+                    <a href="@Url.Action("Index", "RequestFormPriceLists")"><span>需求报价</span></a>
+                </li>
+                <li>
+                    <a href="@Url.Action("Index", "RequestFormTasks")"><span>需求处理</span></a>
+                </li>
+                <li>
+                    <a href="@Url.Action("Index", "RequestFormTaskLists")"><span>需求处理清单</span></a>
+                </li>
+                <li>
+                    <a href="@Url.Action("Index", "RequestFormBugs")"><span>需求Bug日志</span></a>
+                </li>
+            </ul>
+        </li>
+        <li>
+            <span>需求状态</span>
+            <ul>
+                <li>
+                    <a href="@Url.Action("ApplyIndex","RequestForms")"><span>需求申请</span></a>
+                </li>
+                <li>
+                    <a href="@Url.Action("PriceIndex","RequestForms")"><span>需求报价</span></a>
+                </li>
+                <li>
+                    <a href="@Url.Action("SureIndex","RequestForms")"><span>需求确认报价</span></a>
+                </li>
+                <li>
+                    <a href="@Url.Action("ReturnIndex","RequestForms")"><span>需求申请退回</span></a>
+                </li>
+                <li>
+                    <a href="@Url.Action("CancelIndex","RequestForms")"><span>需求申请取消</span></a>
+                </li>
+                <li>
+                    <a href="@Url.Action("OrderIndex","RequestForms")"><span>需求申请接单</span></a>
+                </li>
+                <li>
+                    <a href="@Url.Action("ResolveIndex","RequestForms")"><span>分解任务</span></a>
+                </li>
+                <li>
+                    <a href="@Url.Action("DevelopIndex","RequestForms")"><span>开发中</span></a>
+                </li>
+                <li>
+                    <a href="@Url.Action("TestIndex","RequestForms")"><span>需求测试</span></a>
+                </li>
+                <li>
+                    <a href="@Url.Action("CheckIndex","RequestForms")"><span>需求验收</span></a>
+                </li>
+            </ul>
+        </li>
+        <li>
+            <span>需求执行状态</span>
+            <ul>
+                <li>
+                    <a href="@Url.Action("AppointIndex","RequestFormTasks")"><span>已指派</span></a>
+                </li>
+                <li>
+                    <a href="@Url.Action("AcceptIndex","RequestFormTasks")"><span>已接受</span></a>
+                </li>
+                <li>
+                    <a href="@Url.Action("ExecuteIndex","RequestFormTasks")"><span>执行中</span></a>
+                </li>
+                <li>
+                    <a href="@Url.Action("FinishIndex","RequestFormTasks")"><span>已完成</span></a>
+                </li>
+                <li>
+                    <a href="@Url.Action("DelayIndex","RequestFormTasks")"><span>延期</span></a>
+                </li>
+                <li>
+                    <a href="@Url.Action("CancelIndex","RequestFormTasks")"><span>已取消</span></a>
+                </li>
+            </ul>
+        </li>
+        <li>
+            <span>报表管理</span>
+            <ul>
+                <li>
+                    <a href="@Url.Action("SearchIndex","MaintenanceResults")"><span>维修查询</span></a>
+                </li>
+                <li>
+                    <a href="@Url.Action("SearchIndex", "RequestFormTasks")"><span>需求查询</span></a>
+                </li>
+                <li>
+                    <a href="@Url.Action("Index", "Messages")"><span>消息查询</span></a>
+                </li>
+            </ul>
+        </li>
+
+    </ul>*@
+
+
+
+
+
+@*<ul class="easyui-tree" id="navs"> </ul>
+
+    <script>
+
+        function initMenu() {
+            $.get("/Users/GetTree?userid="+'@HttpContext.Current.Session["UserID"]', function (msg) {
+                if (msg==null) {
+                    $.messager.alert("系统提示", "<font color=red><b>您没有任何权限！请联系管理员。</b></font>", "warning", function () { top.location.href = '/Admin/Member/Login'; });
+                    return;
+                }
+                var d = msg.rows;
+                var $obj = $('#navs');
+                $obj.accordion({ animate: false, fit: true, border: false });
+                for (var i = 0; i < d.length; i++) {
+
+                    if (d[i].ParentID == null)
+                    {
+                        var html = '<ul>';
+                        var ii=d[i].ID;
+                        for (var j = 0; j < d.length; j++) {
+                            if (d[j].ParentID == ii) {
+                                html += "<li><div><a ref=\"" + d[j].ID + " \" href=\"javascript:void(0)\" rel=\"" + d[j].ControllerName+"\\"+ d[j].ActionName+ "\"><span class=\"icon icon-add" + "\">&nbsp;</span><span class=\"nav\">" + d[j].Name + "</span></a></div></li>";
+                            }
+                        }
+                        html += '</ul>';
+                        $obj.accordion('add', {
+                            title: d[i].Name,
+                            content: html,
+                            iconCls: 'icon-add',
+                            border: false
+                        });
+                    }
+                }
+
+                var panels = $obj.accordion('panels');
+                $obj.accordion('select', panels[0].panel('options').title);
+
+                $obj.find('li').click(function () {
+                    $obj.find('li div').removeClass("selected");
+                    $(this).children('div').addClass("selected");
+
+                    var link = $(this).find('a');
+                    var title = link.children('.nav').text();
+                    var url = link.attr("rel");
+                    var code = link.attr("ref");
+                    var icon = link.children('.icon').attr('class');
+                    //alert(icon);
+                    addTab(title, url, icon);
+                }).hover(function () {
+                    $(this).children('div').addClass("hover");
+                }, function () {
+                    $(this).children('div').removeClass("hover");
+                });
+            })
+        };
+
+    </script>
+<!-- END NAVIGATION -->*@

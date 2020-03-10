@@ -1,0 +1,80 @@
+﻿@model GyIMS.Models.ItRole
+
+@{
+    ViewBag.Title = "Delete";
+}
+
+<h2>Delete</h2>
+
+<h3>Are you sure you want to delete this?</h3>
+<div>
+    <h4>ItRole</h4>
+    <hr />
+    <dl class="dl-horizontal">
+        <dt>
+            @Html.DisplayNameFor(model => model.Code)
+        </dt>
+
+        <dd>
+            @Html.DisplayFor(model => model.Code)
+        </dd>
+
+        <dt>
+            @Html.DisplayNameFor(model => model.Name)
+        </dt>
+
+        <dd>
+            @Html.DisplayFor(model => model.Name)
+        </dd>
+
+        <dt>
+            @Html.DisplayNameFor(model => model.DayCost)
+        </dt>
+
+        <dd>
+            @Html.DisplayFor(model => model.DayCost)
+        </dd>
+
+        <dt>
+            @Html.DisplayNameFor(model => model.HourCost)
+        </dt>
+
+        <dd>
+            @Html.DisplayFor(model => model.HourCost)
+        </dd>
+
+        <dt>
+            @Html.DisplayNameFor(model => model.MinuteCost)
+        </dt>
+
+        <dd>
+            @Html.DisplayFor(model => model.MinuteCost)
+        </dd>
+
+        <dt>
+            @Html.DisplayNameFor(model => model.NumCost)
+        </dt>
+
+        <dd>
+            @Html.DisplayFor(model => model.NumCost)
+        </dd>
+
+        <dt>
+            @Html.DisplayNameFor(model => model.Status)
+        </dt>
+
+        <dd>
+            @Html.DisplayFor(model => model.Status)
+        </dd>
+
+    </dl>
+
+    @using (Html.BeginForm()) {
+        @Html.AntiForgeryToken()
+
+        <div class="form-actions no-color">
+            <input type="submit" value="Delete" class="btn btn-default" /> |
+            @Html.ActionLink("Back to List", "Index")
+        </div>
+    }
+</div>

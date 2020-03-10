@@ -1,0 +1,121 @@
+﻿<!DOCTYPE html>
+<html>
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>宏宇货运IT管理系统</title>
+    @Styles.Render("~/Content/css")
+    <link href="~/Scripts/jquery-easyui-1.8.8/themes/default/easyui.css" rel="stylesheet" />
+    <link href="~/Scripts/jquery-easyui-1.8.8/themes/icon.css" rel="stylesheet" />
+    @*引入JQuery和EasyUI*@
+    <script src="~/Scripts/JqCombox.js"></script>
+    <script src="~/Scripts/JqCurrency.js"></script>
+    @*<script src="~/Scripts/jquery-easyui-1.8.8/jquery.min.js"></script>*@
+
+    <script src="~/Scripts/jquery-3.3.1.js"></script>
+    <script src="~/Scripts/jquery-easyui-1.8.8/jquery.easyui.min.js"></script>
+    @*引入EasyUI样式文件*@
+
+    @*引入中文语言包*@
+    <script src="~/Scripts/jquery-easyui-1.8.8/locale/easyui-lang-zh_CN.js"></script>
+
+    @Scripts.Render("~/bundles/modernizr")
+
+</head>
+<body>
+    @*<div class="navbar navbar-inverse navbar-fixed-top">
+            <div class="container">
+                <div class="navbar-header">
+                    <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".navbar-collapse">
+                        <span class="icon-bar"></span>
+                        <span class="icon-bar"></span>
+                        <span class="icon-bar"></span>
+                    </button>
+                    @Html.ActionLink("登录", "Index", "Home", new { area = "" }, new { @class = "navbar-brand" })
+                </div>
+                <div class="navbar-collapse collapse">
+                    <ul class="nav navbar-nav">
+                        <li>@Html.ActionLink("主页", "Index", "Home")</li>
+                        <li>@Html.ActionLink("关于", "About", "Home")</li>
+                        <li>@Html.ActionLink("联系方式", "Contact", "Home")</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+        <div class="container body-content">
+            @RenderBody()
+            <hr />
+            <footer>
+                <p>&copy; @DateTime.Now.Year - 宏宇货运财务管理系统</p>
+            </footer>
+        </div>*@
+
+    <div class="easyui-layout" data-options="fit:true" style="width: 800px;height: 600px;">
+        <!--顶部-->
+        <div region="north" style="height: 70px;width:auto;overflow:hidden;background-color:rgb(177, 217, 242)">
+            <p style="font-size:28px">宏宇货运IT管理系统</p>
+            <div class="navbar navbar-inverse navbar-fixed-top">
+                <div class="container">
+                    <div class="navbar-header">
+                        <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".navbar-collapse">
+                            <span class="icon-bar"></span>
+                            <span class="icon-bar"></span>
+                            <span class="icon-bar"></span>
+                        </button>
+                        @Html.ActionLink("首页", "Index", "Home", new { area = "" }, new { @class = "navbar-brand" })
+                    </div>
+                    <div class="navbar-collapse collapse">
+                        <ul class="nav navbar-nav">
+                            <li>@Html.ActionLink("退出登录", "LoginIndex", "Login")</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!--左侧菜单start-->
+        <div region="west" title="导航菜单" split="true" style="width: 200px;">
+            <div id="RightTree" style=" background-color:#BFEDE2;">
+                @*<div class="panel-loading">加载中...</div>*@
+                @{ Html.RenderPartial("LeftMenu", Request.IsAuthenticated); }
+            </div>
+        </div>
+        <!--左侧菜单end-->
+        <!--中间主要区域-->
+        <div data-options="region:'center',border:false">
+            <div id="mainTab" class="easyui-tabs" data-options="fit:true">
+                <div class="container body-content" title="我的桌面" data-options="closable:true" style="overflow: auto; background:#fff">
+                    @RenderBody()
+                </div>
+            </div>
+        </div>
+
+        <!--底部start-->
+        @*<div region="south" style="text-align: center;height: 50px;">
+                <h3>Copyright © @DateTime.Now.Year</h3>
+            </div>*@
+        <div region="south" style="text-align: center;height: 50px;">
+            <div class="page-footer">
+                <div class="row">
+                    <div class="col-xs-12 col-sm-12">
+                        <span class="txt-color-white">宏宇货运IT管理系统 <span class="hidden-xs"> - 宏宇货运有限公司</span> © @DateTime.Now</span>
+                    </div>
+
+
+                </div>
+            </div>
+        </div>
+        <!--底部end-->
+    </div>
+
+
+
+    @*@Scripts.Render("~/bundles/jquery")*@
+    @Scripts.Render("~/bundles/bootstrap")
+    @Scripts.Render("~/Scripts/validate.js")
+    @Scripts.Render("~/Scripts/message.js")
+    @Scripts.Render("~/Scripts/common.js")
+    @RenderSection("scripts", required: false)
+</body>
+</html>

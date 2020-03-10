@@ -1,0 +1,246 @@
+﻿@model GyIMS.Models.RequestFormPriceList
+
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="UTF-8">
+    <title>需求报价信息-新增</title>
+</head>
+
+<body>
+    <div style="margin:20px 0;"></div>
+
+    <div class="easyui-panel" title="需求报价信息-新增" style="width:100%;height:100%">
+        <div>
+            <form id="Create" method="post" style="width:100%;height:100%">
+                <table style="width:100%;height:100%" cellpadding="10" cellspacing="50">
+                    <tr>
+                        <th width="20%"></th>
+                        <th width="30%"></th>
+                        <th width="20%"></th>
+                        <th width="30%"></th>
+                    </tr>
+                    <tr>
+                        <td align="center">需求报价编号:</td>
+                        <td>
+                            <input class="easyui-textbox" type="text" name="ID"
+                                   data-options="required:true" readonly="readonly" style="width:300px" />
+                        </td>
+                        <td align="center">需求申请单号:</td>
+                        <td>
+                            <select class="easyui-combobox" name="RequestFormID" id="RequestFormID" data-options="required:true" style="width:300px" />
+                        </td>
+
+                    </tr>
+                    <tr>
+                        <td align="center">报价人:</td>
+                        <td>
+                            <input class="easyui-textbox" type="text" name="Offerer"
+                                   data-options="required:true"  style="width:300px" />
+                        </td>
+                        <td align="center">报价日期:</td>
+                        <td>
+                            <input class="easyui-datebox" data-options="formatter:ww4,sharedCalendar:'#cc'"
+                                   style="width:300px;" id="OfferDate">
+                            <div id="cc" class="easyui-calendar"></div>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td align="center">IT角色:</td>
+                        <td>
+                            <select class="easyui-combobox" name="ItRoleID" id="ItRoleID" data-options="required:true" style="width:300px" />
+                        </td>
+                        <td align="center">工作类型:</td>
+                        <td>
+                            <select class="easyui-combobox" name="WorkType" id="WorkType" data-options="required:true" style="width:300px" />
+                        </td>
+                    </tr>
+                    <tr>
+                        <td align="center">时间单位:</td>
+                        <td>
+                            <select class="easyui-combobox" name="TimeUnit" id="TimeUnit" data-options="required:true" style="width:300px" />
+                        </td>
+                        <td align="center">工期:</td>
+                        <td>
+                            <input class="easyui-textbox" type="text" name="SpendTime"
+                                     style="width:300px" />
+                        </td>
+                    </tr>
+                    <tr>
+                        <td align="center">状态:</td>
+                        <td>
+                            <select class="easyui-combobox" name="Status" id="Status" data-options="required:true" style="width:300px" />
+                        </td>
+
+                    </tr>
+                    <tr>
+                        <td align="center">创建时间:</td>
+                        <td>
+                            <input class="easyui-textbox" type="text" name="CreateDate" data-options="required:true" readonly="readonly" style="width:300px" />
+                        </td>
+                        <td align="center">创建人:</td>
+                        <td>
+                            <input class="easyui-textbox" type="text" name="CreatePerson"  style="width:300px" />
+                        </td>
+                    </tr>
+                    <tr>
+                        <td align="center">修改时间:</td>
+                        <td>
+                            <input class="easyui-textbox" type="text" name="UpdateDate" data-options="required:true" readonly="readonly" style="width:300px" />
+                        </td>
+                        <td align="center">修改人:</td>
+                        <td>
+                            <input class="easyui-textbox" type="text" name="UpdatePerson"  style="width:300px" />
+                        </td>
+                    </tr>
+                    <tr style="margin-top:100px">
+                        <td align="center">备注:</td>
+                        <td colspan="3">
+                            <input class="easyui-textbox" name="Summary" data-options="multiline:true"
+                                   style="height:60px;width:875px" />
+                        </td>
+                    </tr>
+                </table>
+            </form>
+            <div style="text-align:center;padding:5px;margin-top:50px">
+                <a href="javascript:void(0)" class="easyui-linkbutton" onclick="submitForm()">提交</a>
+                <a href="/RequestFormPriceLists/Index" class="easyui-linkbutton">返回</a>
+            </div>
+        </div>
+    </div>
+
+    //脚本
+    <script>
+
+    //新增初始化数据
+    $('#Create').form('load', {
+        ID: '@Model.ID',
+        CreateDate: '@Model.CreateDate',
+        CreatePerson: '@HttpContext.Current.Session["UserID"]',
+        UpdateDate: '@Model.CreateDate',
+        UpdatePerson: '@HttpContext.Current.Session["UserID"]'
+    });
+
+
+
+    //新增提交
+    function submitForm() {
+        $('#Create').form('submit', {
+            url: '/RequestFormPriceLists/CreateByForm/',
+            onSubmit: function (param) {
+                param.ID = $('#ID').val();
+                param.RequestFormID = $('#RequestFormID').val();
+                param.Offerer = $('#Offerer').val();
+                param.OfferDate = $('#OfferDate').val();
+                param.ItRoleID = $('#ItRoleID').val();
+                param.WorkType = $('#WorkType').val();
+                param.TimeUnit = $('#TimeUnit').val();
+                param.SpendTime = $('#SpendTime').val();
+                param.Status = $('#Status').val();
+                param.CreateDate = $('#CreateDate').val();
+                param.CreatePerson = $('#CreatePerson').val();
+                param.UpdateDate = $('#UpdateDate').val();
+                param.UpdatePerson = $('#UpdatePerson').val();
+                param.Summary = $('#Summary').val();
+
+            },
+            success: function (data) {
+                alert("需求报价信息创建成功！");
+                window.location.href = "@Url.Action("Index", "RequestFormPriceLists")";
+            }
+        }
+            );
+    };
+    //状态
+    $('#Status').combobox({
+        url: '/RequestFormPriceLists/GetStatus',
+        textField: 'text',
+        valueField: 'id',
+        panelHeight: 'auto',
+        data: {},
+        method: 'get',
+        onLoadSuccess: function () {
+            var id;
+            if ('@Model.Status' == 'Disabled') {
+                id = 0;
+            }
+            else if ('@Model.Status' == 'Able') {
+                id = 1;
+            }
+            else
+            {
+                id = 1;
+            }
+            $('#Status').combobox('setValue', id);
+        }
+    });
+
+    
+
+    //需求申请单
+    $('#RequestFormID').combobox({
+        url: '/RequestFormPriceLists/GetRequestForms',
+        textField: 'text',
+        valueField: 'id',
+        panelHeight: 'auto',
+        data: {},
+        method: 'get',
+        onLoadSuccess: function () {
+            $('#RequestFormID').combobox('setValue', '@Model.RequestFormID');
+        }
+    });
+
+     //工作类型
+    $('#WorkType').combobox({
+        url: '/RequestFormPriceLists/GetWorkType',
+        textField: 'text',
+        valueField: 'id',
+        panelHeight: 'auto',
+        data: {},
+        method: 'get',
+        onLoadSuccess: function () {
+            $('#WorkType').combobox('setValue', '@Model.WorkType');
+        }
+    });
+        //时间单位
+    $('#TimeUnit').combobox({
+        url: '/RequestFormPriceLists/GetTimeUnit',
+        textField: 'text',
+        valueField: 'id',
+        panelHeight: 'auto',
+        data: {},
+        method: 'get',
+        onLoadSuccess: function () {
+            $('#TimeUnit').combobox('setValue', '@Model.TimeUnit');
+        }
+    });
+        //IT角色
+    $('#ItRoleID').combobox({
+        url: '/RequestFormPriceLists/GetITRoles',
+        textField: 'text',
+        valueField: 'id',
+        panelHeight: 'auto',
+        data: {},
+        method: 'get',
+        onLoadSuccess: function () {
+            $('#ItRoleID').combobox('setValue', '@Model.ItRoleID');
+        }
+    });
+
+    //格式化日期
+         function ww4(date){  
+            var y = date.getFullYear();  
+            var m = date.getMonth()+1;  
+            var d = date.getDate()
+            return  y+'-'+m+'-'+d;
+         }
+
+    </script>
+
+
+</body>
+
+
+</html>
+

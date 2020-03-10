@@ -1,0 +1,199 @@
+﻿@model GyIMS.Models.User
+
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="UTF-8">
+    <title>用户信息新增</title>
+</head>
+
+<body>
+    <div style="margin:20px 0;"></div>
+
+    <div class="easyui-panel" title="用户信息新增" style="width:100%;height:100%">
+        <div>
+            <form id="userCreate" method="post" style="width:100%;height:100%">
+                <table style="width:100%;height:100%" cellpadding="10" cellspacing="50">
+                    <tr>
+                        <th width="20%"></th>
+                        <th width="30%"></th>
+                        <th width="20%"></th>
+                        <th width="30%"></th>
+                    </tr>
+                    <tr>
+                        <td align="center">用户编号:</td>
+                        <td>
+                            <input class="easyui-textbox" type="text" name="ID"
+                                   data-options="required:true" readonly="readonly" style="width:300px" />
+                        </td>
+                        <td align="center">用户名:</td>
+                        <td>
+                            <input class="easyui-textbox" type="text" name="Name"
+                                   data-options="required:true" style="width:300px" />
+                        </td>
+
+                    </tr>
+                    <tr>
+
+                        <td align="center">员工工号:</td>
+                        <td>
+                            <input class="easyui-textbox" type="text" name="Code"
+                                   data-options="required:true" style="width:300px" />
+                        </td>
+                        <td align="center">IT标志:</td>
+                        <td>
+                            <select class="easyui-combobox" name="IsIT" data-options="required:true,valueField:'id',
+                                    textField:'text',url: '/Users/GetUserITStatus',method:'get'" style="width:300px" />
+                        </td>
+                    </tr>
+                    <tr>
+                        <td align="center">中文名称:</td>
+                        <td>
+                            <input class="easyui-textbox" type="text" name="ChineseName" data-options="required:true" style="width:300px" />
+                        </td>
+                        <td align="center">英文名称:</td>
+                        <td>
+                            <input class="easyui-textbox" type="text" name="EnglishName" style="width:300px" />
+                        </td>
+                    </tr>
+                    <tr>
+                        <td align="center">登录密码:</td>
+                        <td>
+                            <input class="easyui-passwordbox" prompt="Password" type="password" data-options="required:true" name="Password" style="width:300px" />
+                        </td>
+                        <td align="center">状态:</td>
+                        <td>
+                            <select class="easyui-combobox" name="Status" data-options="required:true,valueField:'id',
+                                    textField:'text',url: '/Users/GetUserStatus',method:'get'" style="width:300px" />
+                        </td>
+                    </tr>
+                    <tr>
+                        <td align="center">创建时间:</td>
+                        <td>
+                            <input class="easyui-textbox" type="text" name="CreateDate" data-options="required:true" readonly="readonly" style="width:300px" />
+                        </td>
+                        <td align="center">创建人:</td>
+                        <td>
+                            <input class="easyui-textbox" type="text" name="CreatePerson" data-options="required:true" style="width:300px" />
+                        </td>
+                    </tr>
+                    <tr>
+                        <td align="center">修改时间:</td>
+                        <td>
+                            <input class="easyui-textbox" type="text" name="UpdateDate" data-options="required:true" readonly="readonly" style="width:300px" />
+                        </td>
+                        <td align="center">修改人:</td>
+                        <td>
+                            <input class="easyui-textbox" type="text" name="UpdatePerson" data-options="required:true" style="width:300px" />
+                        </td>
+                    </tr>
+                    <tr style="margin-top:100px">
+                        <td align="center">备注:</td>
+                        <td colspan="3">
+                            <input class="easyui-textbox" name="Summary" data-options="multiline:true"
+                                   style="height:60px;width:875px" />
+                        </td>
+                    </tr>
+                </table>
+            </form>
+            <div style="text-align:center;padding:5px;margin-top:50px">
+                <a href="javascript:void(0)" class="easyui-linkbutton" onclick="submitForm()">提交</a>
+                <a href="/Users/Index" class="easyui-linkbutton">返回</a>
+            </div>
+        </div>
+    </div>
+
+
+    @*Js脚本*@
+    <script type="text/javascript">
+        $(function () {
+            //新增初始化数据
+            $('#userCreate').form('load', {
+                ID: '@Model.ID',
+                CreateDate: '@Model.CreateDate',
+                CreatePerson: '@HttpContext.Current.Session["UserID"]',
+                UpdateDate: '@Model.UpdateDate',
+                UpdatePerson: '@HttpContext.Current.Session["UserID"]'
+            });
+
+            //状态
+            $('#Status').combobox({
+                url: '/Users/GetUserStatus',
+                textField: 'text',
+                valueField: 'id',
+                panelHeight: 'auto',
+                data: {},
+                method: 'get',
+                onLoadSuccess: function () {
+                    var id;
+                    if ('@Model.Status' == 'Disabled') {
+                        id = 0;
+                    }
+                    else if ('@Model.Status' == 'Able') {
+                        id = 1;
+                    }
+                    $('#Status').combobox('setValue', id);
+                }
+            });
+
+            //IT状态
+            $('#IsIT').combobox({
+                url: '/Users/GetUserITStatus',
+                textField: 'text',
+                valueField: 'id',
+                panelHeight: 'auto',
+                data: {},
+                method: 'get',
+                onLoadSuccess: function () {
+                    var id;
+                    if ('@Model.Status' == 'Disabled') {
+                        id = 0;
+                    }
+                    else if ('@Model.Status' == 'Able') {
+                        id = 1;
+                    }
+                    $('#IsIT').combobox('setValue', id);
+                }
+            });
+        });
+
+
+        //新增提交
+        function submitForm() {
+            $('#userCreate').form('submit', {
+                url: '/Users/CreateByForm/',
+                dataType:'json',
+                onSubmit: function (param) {
+                    param.ID = $('#ID').val();
+                    param.Name = $('#Name').val();
+                    param.Code = $('#Code').val();
+                    param.ChineseName = $('#ChineseName').val();
+                    param.EnglishName = $('#EnglishName').val();
+                    param.Password = $('#Password').val();
+                    param.IsIT = $('#IsIT').val();
+                    param.Status = $('#Status').val();
+                    param.CreateDate = $('#CreateDate').val();
+                    param.CreatePerson = $('#CreatePerson').val();
+                    param.UpdateDate = $('#UpdateDate').val();
+                    param.UpdatePerson = $('#UpdatePerson').val();
+                    param.Summary = $('#Summary').val();
+
+                },
+                success: function (data) {
+                    data = JSON.parse(data);
+                    alert(data.Message);
+                    if (data.Code == 1) {
+                        window.location.href = "@Url.Action("Index", "Users")";
+                    }
+                }
+            });
+        }
+
+
+
+
+
+    </script>
+</body>
+</html>

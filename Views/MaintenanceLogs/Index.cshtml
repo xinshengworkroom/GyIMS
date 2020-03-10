@@ -1,0 +1,114 @@
+﻿@model IEnumerable<GyIMS.Models.MaintenanceLog>
+
+
+@{
+    ViewBag.Title = "运维单信息";
+}
+
+@*界面主体*@
+<div>
+
+    <div id="dg-search" margin="0,30,0,30">
+        <label for="Name">运维单号：</label>
+        <input id="Name" class="easyui-validatebox" data-options="width:200" />
+    </div>
+
+    <table id="dg"></table>
+
+    <div id="dg-button">
+        <a class="easyui-linkbutton" data-options="iconCls:'icon-search'" onclick="Search()">查询</a>
+        <a href="#" class="easyui-linkbutton" data-options="iconCls:'icon-reload'" onclick="Reload()">刷新</a>
+        <a href="#" class="easyui-linkbutton" data-options="iconCls:'icon-blank'" onclick="Export()">导出</a>
+    </div>
+
+</div>
+
+@*脚本*@
+<script>
+
+    $(function () {
+        $("#dg").datagrid({
+            title: '运维申请单信息列表',
+            url: '/MaintenanceLogs/GetMaintenanceList',
+            queryParams: "",
+            columns: [[
+                 { field: 'MaintenanceID', title: '运维单号', width: 150, align: 'center' },
+                 { field: 'Applier', title: '申请人', width: 150, align: 'center' },
+                 { field: 'Region', title: '区域（申请人所在）', width: 150, align: 'center',formatter: getstatusnobyid },
+                 { field: 'Type', title: '问题类型', width: 100, align: 'center', formatter: getstatusnobyid },
+                 { field: 'SysType', title: '软件问题类型', width: 100, align: 'center', formatter: getstatusnobyid },
+                 { field: 'HSysType', title: '硬件问题类型', width: 100, align: 'center', formatter: getstatusnobyid },
+                 { field: 'Name', title: '问题名称', width: 150, align: 'center' },
+                 { field: 'FileName', title: '上传文件名称', width: 150, align: 'center' },
+                 { field: 'OperType', title: '运维状态', width: 150, align: 'center',formatter: getstatusnobyid   },
+                 { field: 'CreateDate', title: '创建时间', width: 150, formatter: gettime, align: 'center' },
+                 { field: 'CreatePerson', title: '创建人', width: 100, align: 'center' },
+            ]],
+            toolbar: '#dg-button',
+            singleSelect: true,
+            pagination: true,
+            pageSize: 10,
+            pageList: [10, 20, 30],
+            method: 'get'
+        });
+    })
+
+    //刷新
+    function Reload() {
+        $('#Name').val("");
+        InitGrid("");
+    }
+
+    
+
+
+
+    //查询
+    function Search() {
+        //得到用户输入的参数，取值有几种方式：$("#id").combobox('getValue'), $("#id").datebox('getValue'), $("#id").val()
+        //字段增加WHC_前缀字符，避免传递如URL这样的Request关键字冲突
+        var queryData = {
+            Name: $("#Name").val()
+        }
+        //将值传递给
+        InitGrid(queryData);
+        return false;
+    }
+
+    //初始化查询数据
+    function InitGrid(queryData) {
+        $("#dg").datagrid({
+            title: '运维申请清单信息列表',
+            url: '/MaintenanceLogs/GetMaintenanceList',
+            queryParams: queryData,
+            columns: [[
+                 { field: 'MaintenanceID', title: '运维单号', width: 150, align: 'center' },
+                 { field: 'Applier', title: '申请人', width: 150, align: 'center' },
+                 { field: 'Region', title: '区域（申请人所在）', width: 150, align: 'center',formatter: getstatusnobyid },
+                 { field: 'Type', title: '问题类型', width: 100, align: 'center', formatter: getstatusnobyid },
+                 { field: 'SysType', title: '软件问题类型', width: 100, align: 'center', formatter: getstatusnobyid },
+                 { field: 'HSysType', title: '硬件问题类型', width: 100, align: 'center', formatter: getstatusnobyid },
+                 { field: 'Name', title: '问题名称', width: 150, align: 'center' },
+                 { field: 'FileName', title: '上传文件名称', width: 150, align: 'center' },
+                 { field: 'OperType', title: '运维状态', width: 150, align: 'center',formatter: getstatusnobyid   },
+                 { field: 'CreateDate', title: '创建时间', width: 150, formatter: gettime, align: 'center' },
+                 { field: 'CreatePerson', title: '创建人', width: 100, align: 'center' },
+            ]],
+            toolbar: '#dg-button',
+            singleSelect: true,
+            pagination: true,
+            pageSize: 10,
+            pageList: [10, 20, 30],
+            method: 'get'
+        });
+    }
+
+    function Export() {
+        var queryData = {
+            Name: $("#Name").val()
+        }
+        downloadFile("@Url.Action("Export")", queryData);
+    }
+</script>
+
+

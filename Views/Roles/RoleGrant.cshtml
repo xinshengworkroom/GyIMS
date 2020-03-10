@@ -1,0 +1,145 @@
+﻿@model GyIMS.Models.Role
+@{
+    ViewBag.Title = "角色信息";
+}
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="UTF-8">
+    <title>角色信息授权</title>
+</head>
+<body>
+    <div style="margin:20px 0;"></div>
+
+    <div class="easyui-panel" title="角色信息授权" style="width:100%;height:100%">
+        <div>
+            <form id="roleGrant" method="post" style="width:100%;height:100%">
+                <table style="width:100%;height:100%" cellpadding="10" cellspacing="50">
+                    <tr>
+                        <th width="20%"></th>
+                        <th width="30%"></th>
+                        <th width="20%"></th>
+                        <th width="30%"></th>
+                    </tr>
+                    <tr>
+                        <td align="center">角色编号:</td>
+                        <td>
+                            <input class="easyui-textbox" type="text" name="ID" id="ID"
+                                   data-options="required:true" readonly="readonly" style="width:300px" />
+                        </td>
+                        <td align="center">角色名称:</td>
+                        <td>
+                            <input class="easyui-textbox" type="text" name="Name" readonly="readonly"
+                                   data-options="required:true" style="width:300px" />
+                        </td>
+
+                    </tr>
+                    <tr>
+                        <td align="center">中文名称:</td>
+                        <td>
+                            <input class="easyui-textbox" type="text" name="ChineseName" data-options="required:true" readonly="readonly" style="width:300px" />
+                        </td>
+                        <td align="center">英文名称:</td>
+                        <td>
+                            <input class="easyui-textbox" type="text" name="EnglishName" style="width:300px" readonly="readonly" />
+                        </td>
+                    </tr>
+                </table>
+
+                <table id="dg"></table>
+            </form>
+            <div id="dg-button">
+                <a href="javascript:void(0)" class="easyui-linkbutton" data-options="iconCls:'icon-ok'" onclick="submitForm()">确定授权</a>
+                <a href="/Roles/Index" class="easyui-linkbutton" data-options="iconCls:'icon-back'">返回</a>
+            </div>
+        </div>
+    </div>
+
+
+
+    <script>
+
+
+    $(function () {
+        $("#dg").datagrid({
+            title: '菜单信息列表',
+            url: '/Roles/GetRoleMenuList',
+            queryParams: { RoleID:'@ViewBag.RoleID'},
+            columns: [[
+                {
+                    field: 'ck', title: '选择', checkbox: true, width: 30
+                },
+                 { field: 'IsGrant', title: '授权状态', width: 150, align: 'center' },
+                 { field: 'MenuID', title: '菜单ID', width: 100, align: 'center' },
+                 { field: 'MenuName', title: '菜单名称', width: 150, align: 'center' },
+                 { field: 'ControllerName', title: '控制器', width: 150, align: 'center' },
+                 { field: 'ActionName', title: '功能', width: 150, align: 'center' }
+            ]],
+            toolbar: '#dg-button',
+            singleSelect: false,
+            checkbox: true,
+            pagination: true,
+            pageSize: 10,
+            pageList: [10, 20, 30],
+            method: 'get',
+            onLoadSuccess: function (data) {
+                if (data) {
+                    $.each(data.rows, function (index, item) {
+                        if (item.IsGrant) {
+                            $('#dg').datagrid('checkRow', index);
+                        }
+                        else {
+                            $('#dg').datagrid('uncheckRow', index);
+                        }
+                    });
+                }
+            }
+        });
+    })
+
+
+    //新增初始化数据
+    $('#roleGrant').form('load', {
+        ID: '@Model.ID',
+        Name: '@Model.Name',
+        ChineseName: '@Model.ChineseName',
+        EnglishName: '@Model.EnglishName'
+    });
+
+
+
+    //授权提交
+    function submitForm() {
+        var ids = [];
+        var rows = $('#dg').datagrid('getSelections');
+
+        var strMenus = "";
+        var roleID = $('#ID').val();
+        for (var i = 0; i < rows.length; i++) {
+            if (strMenus == '') {
+                strMenus = rows[i].MenuID;
+            } else {
+                strMenus += ',' + rows[i].MenuID;
+            }
+        }
+        $('#roleGrant').form('submit', {
+            url: '/Roles/RoleGrantByForm?roleID=' + roleID + '&&menuIDList=' + strMenus,
+            onSubmit: function () {
+            },
+            success: function (data) {
+                alert("角色授权成功！")
+                window.location.href = "@Url.Action("Index", "Roles")";
+            }
+        }
+            );
+    }
+
+
+
+
+
+    </script>
+</body>
+</html>
+

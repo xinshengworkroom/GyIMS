@@ -1,0 +1,241 @@
+﻿@model GyIMS.Models.RequestFormFile
+
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>需求文档信息-编辑</title>
+</head>
+
+<body>
+    <div style="margin:20px 0;"></div>
+
+    <div class="easyui-panel" title="需求文档-编辑" style="width:100%;height:100%">
+        <div>
+            <form id="Edit" method="post" style="width:100%;height:100%">
+                <table style="width:100%;height:100%" cellpadding="10" cellspacing="50">
+                    <tr>
+                        <th width="20%"></th>
+                        <th width="30%"></th>
+                        <th width="20%"></th>
+                        <th width="30%"></th>
+                    </tr>
+                    <tr>
+                        <td align="center">需求文档编号:</td>
+                        <td>
+                            <input class="easyui-textbox" type="text" name="ID"
+                                   data-options="required:true" readonly="readonly" style="width:300px" />
+                        </td>
+                        <td align="center">需求申请单号:</td>
+                        <td>
+                            <select class="easyui-combobox" name="RequestFormID" id="RequestFormID" data-options="required:true" style="width:300px" />
+                        </td>
+
+                    </tr>
+                    <tr>
+                        <td align="center">需求任务编号:</td>
+                        <td>
+                            <select class="easyui-combobox" name="RequestFormTaskID" id="RequestFormTaskID" style="width:300px" />
+                        </td>
+                        <td align="center">任务明细编号:</td>
+                        <td>
+                            <select class="easyui-combobox" name="RequestFormTaskListID" id="RequestFormTaskListID" style="width:300px" />
+                        </td>
+                    </tr>
+                    <tr>
+                        <td align="center">附件名称:</td>
+                        <td>
+                            <input class="easyui-textbox" type="text" name="FileName"
+                                   style="width:300px" />
+                        </td>
+                        <td align="center">附件类型:</td>
+                        <td>
+                            <input class="easyui-textbox" type="text" name="FilePath"
+                                   style="width:300px" />
+                        </td>
+                    </tr>
+                    <tr>
+                        <td align="center">状态:</td>
+                        <td>
+                            <select class="easyui-combobox" name="Status" id="Status" data-options="required:true" style="width:300px" />
+                        </td>
+                        <td align="center">文件类型:</td>
+                        <td>
+                            <select class="easyui-combobox" name="Type" id="Type" data-options="required:true" style="width:300px" />
+                        </td>
+                    </tr>
+                    <tr>
+                        <td align="center">创建时间:</td>
+                        <td>
+                            <input class="easyui-textbox" type="text" name="CreateDate" data-options="required:true" readonly="readonly" style="width:300px" />
+                        </td>
+                        <td align="center">创建人:</td>
+                        <td>
+                            <input class="easyui-textbox" type="text" name="CreatePerson" style="width:300px" />
+                        </td>
+                    </tr>
+                    <tr>
+                        <td align="center">修改时间:</td>
+                        <td>
+                            <input class="easyui-textbox" type="text" name="UpdateDate" data-options="required:true" readonly="readonly" style="width:300px" />
+                        </td>
+                        <td align="center">修改人:</td>
+                        <td>
+                            <input class="easyui-textbox" type="text" name="UpdatePerson" style="width:300px" />
+                        </td>
+                    </tr>
+                    <tr style="margin-top:100px">
+                        <td align="center">备注:</td>
+                        <td colspan="3">
+                            <input class="easyui-textbox" name="Summary" data-options="multiline:true"
+                                   style="height:60px;width:875px" />
+                        </td>
+                    </tr>
+                </table>
+            </form>
+            <div style="text-align:center;padding:5px;margin-top:50px">
+                <a href="javascript:void(0)" class="easyui-linkbutton" onclick="UpdateForm()">保存</a>
+                <a href="/RequestFormFiles/Index" class="easyui-linkbutton">返回</a>
+            </div>
+        </div>
+    </div>
+
+    @*Js脚本*@
+    <script>
+
+        //编辑初始化数据
+        $('#Edit').form('load', {
+            ID: '@Model.ID',
+            RequestFormID: '@Model.RequestFormID',
+            RequestFormTaskID: '@Model.RequestFormTaskID',
+            RequestFormTaskListID: '@Model.RequestFormTaskListID',
+            Type: '@Model.Type',
+            FileName: '@Model.FileName',
+            FilePath: '@Model.FilePath',
+            Status: '@Model.Status',
+            Summary: '@Model.Summary',
+            CreateDate: '@Model.CreateDate',
+            CreatePerson: '@Model.CreatePerson',
+            UpdateDate: '@Model.CreateDate',
+            UpdatePerson: '@Model.UpdatePerson'
+        });
+
+        //状态
+    $('#Status').combobox({
+        url: '/RequestFormFiles/GetStatus',
+        textField: 'text',
+        valueField: 'id',
+        panelHeight: 'auto',
+        data: {},
+        method: 'get',
+        onLoadSuccess: function () {
+            var id;
+            if ('@Model.Status' == 'Disabled') {
+                id = 0;
+            }
+            else if ('@Model.Status' == 'Able') {
+                id = 1;
+            }
+            else
+            {
+                id = 1;
+            }
+            $('#Status').combobox('setValue', id);
+        }
+    });
+
+    
+
+    //获取需求申请单
+    $('#RequestFormID').combobox({
+        url: '/RequestFormFiles/GetRequestForms',
+        textField: 'text',
+        valueField: 'id',
+        panelHeight: 'auto',
+        data: {},
+        method: 'get',
+        onLoadSuccess: function () {
+            $('#RequestFormID').combobox('setValue', '@Model.RequestFormID');
+        }
+    });
+
+        //获取需求任务
+    $('#RequestFormTaskID').combobox({
+        url: '/RequestFormFiles/GetRequestFormTasks',
+        textField: 'text',
+        valueField: 'id',
+        panelHeight: 'auto',
+        data: {},
+        method: 'get',
+        onLoadSuccess: function () {
+            $('#RequestFormTaskID').combobox('setValue', '@Model.RequestFormTaskID');
+        }
+    });
+
+        //获取需求任务明细
+    $('#RequestFormTaskListID').combobox({
+        url: '/RequestFormFiles/GetRequestFormTaskLists',
+        textField: 'text',
+        valueField: 'id',
+        panelHeight: 'auto',
+        data: {},
+        method: 'get',
+        onLoadSuccess: function () {
+            $('#RequestFormTaskListID').combobox('setValue', '@Model.RequestFormTaskListID');
+        }
+    });
+
+        //获取需求文档类型
+    $('#Type').combobox({
+        url: '/RequestFormFiles/GetRequestTypeStatus',
+        textField: 'text',
+        valueField: 'id',
+        panelHeight: 'auto',
+        data: {},
+        method: 'get',
+        onLoadSuccess: function () {
+            $('#Type').combobox('setValue', '@Model.Type');
+        }
+    });
+
+
+
+
+
+        //修改提交
+        function UpdateForm() {
+            $('#Edit').form('submit', {
+                url: '/RequestFormFiles/EditByForm/',
+                onSubmit: function (param) {
+                    param.ID = $('#ID').val();
+                    param.RequestFormID = $('#RequestFormID').val();
+                    param.RequestFormTaskID = $('#RequestFormTaskID').val();
+                    param.RequestFormTaskListID = $('#RequestFormTaskListID').val();
+                    param.Type = $('#Type').val();
+                    param.FileName = $('#FileName').val();
+                    param.FilePath = $('#FilePath').val();
+                    param.Status = $('#Status').val();
+                    param.CreateDate = $('#CreateDate').val();
+                    param.CreatePerson = $('#CreatePerson').val();
+                    param.UpdateDate = $('#UpdateDate').val();
+                    param.UpdatePerson = $('#UpdatePerson').val();
+                    param.Summary = $('#Summary').val();
+
+                },
+                success: function (data) {
+                    alert("需求文档信息修改成功！");
+                    window.location.href = "@Url.Action("Index", "RequestFormFiles")";
+                }
+            }
+            );
+        }
+
+
+
+
+
+    </script>
+
+</body>
+</html>
+

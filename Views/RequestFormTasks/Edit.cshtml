@@ -1,0 +1,266 @@
+﻿@model GyIMS.Models.RequestFormTask
+
+
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>需求任务信息-编辑</title>
+</head>
+
+<body>
+    <div style="margin:20px 0;"></div>
+
+    <div class="easyui-panel" title="需求任务-编辑" style="width:100%;height:100%">
+        <div>
+            <form id="Edit" method="post" style="width:100%;height:100%">
+                <table style="width:100%;height:100%" cellpadding="10" cellspacing="50">
+                    <tr>
+                        <th width="20%"></th>
+                        <th width="30%"></th>
+                        <th width="20%"></th>
+                        <th width="30%"></th>
+                    </tr>
+                    <tr>
+                        <td align="center">需求任务编号:</td>
+                        <td>
+                            <input class="easyui-textbox" type="text" name="ID"
+                                   data-options="required:true" readonly="readonly" style="width:300px" />
+                        </td>
+                        <td align="center">需求申请单号:</td>
+                        <td>
+                            <input class="easyui-textbox" type="text" name="RequestFormID"
+                                   data-options="required:true" readonly="readonly" style="width:300px" />                        </td>
+
+                    </tr>
+                    <tr>
+                        <td align="center">任务指派人:</td>
+                        <td>
+                            <input class="easyui-textbox" type="text" name="Assigner"
+                                   data-options="required:true" style="width:300px" />
+                        </td>
+                        <td align="center">IT角色:</td>
+                        <td>
+                            <select class="easyui-combobox" name="ItRoleID" id="ItRoleID" data-options="required:true" style="width:300px" />
+                        </td>
+                    </tr>
+                    <tr>
+                        <td align="center">处理人:</td>
+                        <td>
+                            <input class="easyui-textbox" type="text" name="Handler"
+                                   style="width:300px" />
+                        </td>
+                        <td align="center">任务开始日期</td>
+                        <td>
+                            <input class="easyui-textbox" type="text" name="FromDate"
+                                   style="width:300px" />
+                        </td>
+                    </tr>
+                    <tr>
+                        <td align="center">任务结束日期</td>
+                        <td>
+                            <input class="easyui-textbox" type="text" name="ToDate"
+                                   style="width:300px" />
+                        </td>
+                        <td align="center">需求占比:</td>
+                        <td>
+                            <input class="easyui-textbox" type="text" name="PercentOfRequest"
+                                   style="width:300px" />
+                        </td>
+                    </tr>
+                    <tr>
+
+                        <td align="center">任务状态:</td>
+                        <td>
+                            <select class="easyui-combobox" name="TaskStatus" id="TaskStatus" data-options="required:true" style="width:300px" />
+                        </td>
+                    </tr>
+                    <tr>
+                        <td align="center">上传文件名称:</td>
+                        <td>
+                            <input class="easyui-textbox" type="text" name="FileName"
+                                   style="width:300px" />
+                        </td>
+                        <td align="center">状态:</td>
+                        <td>
+                            <select class="easyui-combobox" name="Status" id="Status" data-options="required:true" style="width:300px" />
+                        </td>
+
+                    </tr>
+                    <tr>
+                        <td align="center">创建时间:</td>
+                        <td>
+                            <input class="easyui-textbox" type="text" name="CreateDate" data-options="required:true" readonly="readonly" style="width:300px" />
+                        </td>
+                        <td align="center">创建人:</td>
+                        <td>
+                            <input class="easyui-textbox" type="text" name="CreatePerson" style="width:300px" />
+                        </td>
+                    </tr>
+                    <tr>
+                        <td align="center">修改时间:</td>
+                        <td>
+                            <input class="easyui-textbox" type="text" name="UpdateDate" data-options="required:true" readonly="readonly" style="width:300px" />
+                        </td>
+                        <td align="center">修改人:</td>
+                        <td>
+                            <input class="easyui-textbox" type="text" name="UpdatePerson" style="width:300px" />
+                        </td>
+                    </tr>
+                    <tr style="margin-top:100px">
+                        <td align="center">任务描述:</td>
+                        <td colspan="3">
+                            <input class="easyui-textbox" name="Description" data-options="multiline:true"
+                                   style="height:60px;width:875px" />
+                        </td>
+                    </tr>
+                    <tr style="margin-top:100px">
+                        <td align="center">备注:</td>
+                        <td colspan="3">
+                            <input class="easyui-textbox" name="Summary" data-options="multiline:true"
+                                   style="height:60px;width:875px" />
+                        </td>
+                    </tr>
+                </table>
+            </form>
+            <div style="text-align:center;padding:5px;margin-top:50px">
+                <a href="javascript:void(0)" class="easyui-linkbutton" onclick="UpdateForm()">保存</a>
+                <a href="/RequestFormTasks/Index" class="easyui-linkbutton">返回</a>
+            </div>
+        </div>
+    </div>
+
+    @*Js脚本*@
+    <script>
+
+        //编辑初始化数据
+        $('#Edit').form('load', {
+            ID: '@Model.ID',
+            RequestFormID: '@Model.RequestFormID',
+            Assigner: '@Model.Assigner',
+            ItRoleID: '@Model.ItRoleID',
+            Handler: '@Model.Handler',
+            FromDate: '@Model.FromDate',
+            ToDate: '@Model.ToDate',
+            PercentOfRequest: '@Model.PercentOfRequest',
+            Description: '@Model.Description',
+            FileName: '@Model.FileName',
+            TaskStatus: '@Model.TaskStatus',
+            Status: '@Model.Status',
+            Summary: '@Model.Summary',
+            CreateDate: '@Model.CreateDate',
+            CreatePerson: '@Model.CreatePerson',
+            UpdateDate: '@Model.CreateDate',
+            UpdatePerson: '@Model.UpdatePerson'
+        });
+
+        //状态
+    $('#Status').combobox({
+        url: '/RequestFormTasks/GetStatus',
+        textField: 'text',
+        valueField: 'id',
+        panelHeight: 'auto',
+        data: {},
+        method: 'get',
+        onLoadSuccess: function () {
+            var id;
+            if ('@Model.Status' == 'Disabled') {
+                id = 0;
+            }
+            else if ('@Model.Status' == 'Able') {
+                id = 1;
+            }
+            else
+            {
+                id = 1;
+            }
+            $('#Status').combobox('setValue', id);
+        }
+    });
+
+    
+
+    //需求申请单
+    $('#RequestFormID').combobox({
+        url: '/RequestFormTasks/GetRequestForms',
+        textField: 'text',
+        valueField: 'id',
+        panelHeight: 'auto',
+        data: {},
+        method: 'get',
+        onLoadSuccess: function () {
+            $('#RequestFormID').combobox('setValue', '@Model.RequestFormID');
+        }
+    });
+
+    //IT角色
+    $('#ItRoleID').combobox({
+        url: '/RequestFormTasks/GetITRoles',
+        textField: 'text',
+        valueField: 'id',
+        panelHeight: 'auto',
+        data: {},
+        method: 'get',
+        onLoadSuccess: function () {
+            $('#ItRoleID').combobox('setValue', '@Model.ItRoleID');
+        }
+    });
+
+    //任务状态
+    StatusJson.ID = "#TaskStatus";
+    StatusJson.TableName = "RequestFormTasks";
+    StatusJson.StatusDesc = "RFWorkSts";
+    GetStatusType(StatusJson);
+   
+   
+
+    
+
+
+
+
+
+        //修改提交
+        function UpdateForm() {
+            $('#Edit').form('submit', {
+                url: '/RequestFormTasks/EditByForm/',
+                dataType:"json",
+                onSubmit: function (param) {
+                    param.ID = $('#ID').val();
+                    param.RequestFormID = $('#RequestFormID').val();
+                    param.Assigner = $('#Assigner').val();
+                    param.ItRoleID = $('#ItRoleID').val();
+                    param.Handler = $('#Handler').val();
+                    param.FromDate = $('#FromDate').val();
+                    param.ToDate = $('#ToDate').val();
+                    param.PercentOfRequest = $('#PercentOfRequest').val();
+                    param.Description = $('#Description').val();
+                    param.FileName = $('#FileName').val();
+                    param.TaskStatus = $('#TaskStatus').val();
+                    param.Status = $('#Status').val();
+                    param.CreateDate = $('#CreateDate').val();
+                    param.CreatePerson = $('#CreatePerson').val();
+                    param.UpdateDate = $('#UpdateDate').val();
+                    param.UpdatePerson = $('#UpdatePerson').val();
+                    param.Summary = $('#Summary').val();
+
+                },
+                success: function (data) {
+                    data = JSON.parse(data);                   
+                    alert(data.Message);
+                    if (data.Code == 1) {
+                        window.location.href = "@Url.Action("Index", "RequestFormTasks")";
+                    }
+                }
+            });
+        }
+
+
+
+
+
+    </script>
+
+</body>
+</html>
+

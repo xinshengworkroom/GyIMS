@@ -1,0 +1,58 @@
+﻿@model GyIMS.Models.MaintenanceLog
+
+@{
+    ViewBag.Title = "Details";
+}
+
+<h2>Details</h2>
+
+<div>
+    <h4>MaintenanceLog</h4>
+    <hr />
+    <dl class="dl-horizontal">
+        <dt>
+            @Html.DisplayNameFor(model => model.MaintenanceID)
+        </dt>
+
+        <dd>
+            @Html.DisplayFor(model => model.MaintenanceID)
+        </dd>
+
+        <dt>
+            @Html.DisplayNameFor(model => model.OperType)
+        </dt>
+
+        <dd>
+            @Html.DisplayFor(model => model.OperType)
+        </dd>
+
+        <dt>
+            @Html.DisplayNameFor(model => model.CreateDate)
+        </dt>
+
+        <dd>
+            @Html.DisplayFor(model => model.CreateDate)
+        </dd>
+
+        <dt>
+            @Html.DisplayNameFor(model => model.CreatePerson)
+        </dt>
+
+        <dd>
+            @Html.DisplayFor(model => model.CreatePerson)
+        </dd>
+
+        <dt>
+            @Html.DisplayNameFor(model => model.Summary)
+        </dt>
+
+        <dd>
+            @Html.DisplayFor(model => model.Summary)
+        </dd>
+
+    </dl>
+</div>
+<p>
+    @Html.ActionLink("Edit", "Edit", new { id = Model.ID }) |
+    @Html.ActionLink("Back to List", "Index")
+</p>

@@ -1,0 +1,335 @@
+﻿@model IEnumerable<GyIMS.Models.RequestFormTask>
+
+@{
+    ViewBag.Title = "需求任务信息";
+}
+
+@*界面主体*@
+<div>
+
+    <div id="dg-search" margin="0,30,0,30">
+        <label for="RequestFormName">需求名称：</label>
+        <input id="RequestFormName" class="easyui-validatebox" data-options="width:200" />
+    </div>
+
+    <table id="dg"></table>
+
+    <div id="dg-button">
+        <a class="easyui-linkbutton" data-options="iconCls:'icon-search'" onclick="Search()">查询</a>
+        <a href="#" class="easyui-linkbutton" data-options="iconCls:'icon-reload'" onclick="Reload()">刷新</a>
+        @*<a href="/RequestFormTasks/Create" class="easyui-linkbutton" data-options="iconCls:'icon-add'">添加</a>*@
+        <a href="javascript:void(0)" class="easyui-linkbutton" data-options="iconCls:'icon-man' " onclick="Appoint()">指派</a>
+        <a href="javascript:void(0)" class="easyui-linkbutton" data-options="iconCls:'icon-save' " onclick="Accept()">接受</a>
+        <a href="javascript:void(0)" class="easyui-linkbutton" data-options="iconCls:'icon-redo' " onclick="Execute()">执行</a>
+        <a href="javascript:void(0)" class="easyui-linkbutton" data-options="iconCls:'icon-ok' " onclick="Finish()">完成</a>
+        <a href="javascript:void(0)" class="easyui-linkbutton" data-options="iconCls:'icon-undo' " onclick="Delay()">延期</a>
+        <a href="javascript:void(0)" class="easyui-linkbutton" data-options="iconCls:'icon-cancel' " onclick="Cancel()">取消</a>
+        <a href="javascript:void(0)" class="easyui-linkbutton" data-options="iconCls:'icon-edit' " onclick="Edit()">修改</a>
+        <a href="javascript:void(0)" class="easyui-linkbutton" data-options="iconCls:'icon-remove'" onclick="Delete()">删除</a>
+        @*<a href="#" class="easyui-linkbutton" data-options="iconCls:'icon-blank'" onclick="Export()">导出</a>*@
+    </div>
+
+</div>
+
+@*脚本*@
+<script>
+
+    $(function () {
+        $("#dg").datagrid({
+            title: '需求任务信息列表',
+            url: '/RequestFormTasks/GetRequestFormTaskFinishList',
+            queryParams: "",
+            columns: [[
+                { field: 'ID', title: '需求任务编号', width: 100, align: 'center' },
+                { field: 'RequestFormID', title: '需求申请单号', width: 150, align: 'center' },
+                { field: 'RequestFormName', title: '需求名称', width: 150, align: 'center' },
+                { field: 'Assigner', title: '任务指派人', width: 150, align: 'center' },
+                { field: 'ItRoleName', title: 'IT角色', width: 150, align: 'center' },
+                { field: 'Handler', title: '处理人', width: 150, align: 'center' },
+                { field: 'FromDate', title: '任务开始日期',formatter: function (value, row, index) {
+                          return new Date(parseInt(value.substr(6, 13))).toLocaleDateString();
+                      }, width: 150, align: 'center' },
+                { field: 'ToDate', title: '任务结束日期',formatter: function (value, row, index) {
+                          return new Date(parseInt(value.substr(6, 13))).toLocaleDateString();
+                      }, width: 150, align: 'center' },
+                { field: 'PercentOfRequest', title: '需求占比', width: 150, align: 'center' },
+                { field: 'Description', title: '任务描述', width: 150, align: 'center' },
+                { field: 'TaskStatusName', title: '任务状态', width: 150, align: 'center' },
+                 { field: 'StatusName', title: '状态', width: 60, align: 'center' },
+                 {
+                     field: 'CreateDate', title: '创建时间', width: 100, formatter: function (value, row, index) {
+                         return new Date(parseInt(value.substr(6, 13))).toLocaleDateString();
+                     }, align: 'center'
+                 },
+                 { field: 'CreatePersonName', title: '创建人', width: 100, align: 'center' },
+                  {
+                      field: 'UpdateDate', title: '修改时间', width: 100, formatter: function (value, row, index) {
+                          return new Date(parseInt(value.substr(6, 13))).toLocaleDateString();
+                      }, align: 'center'
+                  },
+                  { field: 'UpdatePersonName', title: '修改人', width: 100, align: 'center' },
+                   { field: 'Summary', title: '备注', width: 100, align: 'center' }
+            ]],
+            toolbar: '#dg-button',
+            singleSelect: true,
+            pagination: true,
+            pageSize: 10,
+            pageList: [10, 20, 30],
+            method: 'get'
+        });
+    })
+
+    //刷新
+    function Reload() {
+        $('#RequestFormName').val("");
+        InitGrid("");
+    }
+
+    //修改
+    function Edit() {
+        var row = $('#dg').datagrid('getSelected');
+        if (row == null) {
+            alert("需要先选择要修改的数据！")
+        }
+        else {
+            window.location.href = "/RequestFormTasks/Edit/" + row.ID;
+        }
+
+    };
+
+    //删除
+    function Delete() {
+        var row = $('#dg').datagrid('getSelected');
+        if (row == null) {
+            alert("需要先选择要删除的数据！")
+        }
+        else {
+            if (confirm("你确定要删除该需求任务信息吗？")) {
+                $.ajax({
+                    url: '/RequestFormTasks/DeleteByAjax',//地址
+                    dataType: 'text',//返回数据类型
+                    type: 'POST',//类型
+                    data: { id: row.ID },
+                    //请求成功
+                    success: function () {
+                        alert("删除数据成功！");
+                        window.location.href = "/RequestFormTasks/FinishIndex/";
+                    }
+                })
+            }
+
+        }
+    }
+
+    //任务指派
+    function Appoint() {
+        var row = $('#dg').datagrid('getSelected');
+        if (row == null) {
+            alert("需要先选择要指派的任务！")
+        }
+        else {
+            if (confirm("你确定要指派该需求任务信息吗？")) {
+                $.ajax({
+                    url: '/RequestFormTasks/AppointByAjax',//地址
+                    dataType: 'text',//返回数据类型
+                    type: 'POST',//类型
+                    data: { id: row.ID },
+                    //请求成功
+                    success: function () {
+                        alert("指派任务成功！");
+                        window.location.href = "/RequestFormTasks/FinishIndex/";
+                    }
+                })
+            }
+
+        }
+    }
+
+    //任务接受
+    function Accept() {
+        var row = $('#dg').datagrid('getSelected');
+        if (row == null) {
+            alert("需要先选择要接受的任务！")
+        }
+        else {
+            if (confirm("你确定要接受该需求任务信息吗？")) {
+                $.ajax({
+                    url: '/RequestFormTasks/AcceptByAjax',//地址
+                    dataType: 'text',//返回数据类型
+                    type: 'POST',//类型
+                    data: { id: row.ID },
+                    //请求成功
+                    success: function () {
+                        alert("接受任务成功！");
+                        window.location.href = "/RequestFormTasks/FinishIndex/";
+                    }
+                })
+            }
+
+        }
+    }
+
+    //任务执行
+    function Execute() {
+        var row = $('#dg').datagrid('getSelected');
+        if (row == null) {
+            alert("需要先选择要执行的任务！")
+        }
+        else {
+            if (confirm("你确定要执行该需求任务信息吗？")) {
+                $.ajax({
+                    url: '/RequestFormTasks/ExecuteByAjax',//地址
+                    dataType: 'text',//返回数据类型
+                    type: 'POST',//类型
+                    data: { id: row.ID },
+                    //请求成功
+                    success: function () {
+                        alert("任务执行成功！");
+                        window.location.href = "/RequestFormTasks/FinishIndex/";
+                    }
+                })
+            }
+
+        }
+    }
+
+    //任务完成
+    function Finish() {
+        var row = $('#dg').datagrid('getSelected');
+        if (row == null) {
+            alert("需要先选择要完成的任务！")
+        }
+        else {
+            if (confirm("你确定要完成该需求任务信息吗？")) {
+                $.ajax({
+                    url: '/RequestFormTasks/FinishByAjax',//地址
+                    dataType: 'text',//返回数据类型
+                    type: 'POST',//类型
+                    data: { id: row.ID },
+                    //请求成功
+                    success: function () {
+                        alert("任务完成成功！");
+                        window.location.href = "/RequestFormTasks/FinishIndex/";
+                    }
+                })
+            }
+
+        }
+    }
+
+    //任务延期
+    function Delay() {
+        var row = $('#dg').datagrid('getSelected');
+        if (row == null) {
+            alert("需要先选择要延期的任务！")
+        }
+        else {
+            if (confirm("你确定要延期该需求任务信息吗？")) {
+                $.ajax({
+                    url: '/RequestFormTasks/DelayByAjax',//地址
+                    dataType: 'text',//返回数据类型
+                    type: 'POST',//类型
+                    data: { id: row.ID },
+                    //请求成功
+                    success: function () {
+                        alert("任务延期成功！");
+                        window.location.href = "/RequestFormTasks/FinishIndex/";
+                    }
+                })
+            }
+
+        }
+    }
+
+    //任务取消
+    function Cancel() {
+        var row = $('#dg').datagrid('getSelected');
+        if (row == null) {
+            alert("需要先选择要取消的任务！")
+        }
+        else {
+            if (confirm("你确定要取消该需求任务信息吗？")) {
+                $.ajax({
+                    url: '/RequestFormTasks/CancelByAjax',//地址
+                    dataType: 'text',//返回数据类型
+                    type: 'POST',//类型
+                    data: { id: row.ID },
+                    //请求成功
+                    success: function () {
+                        alert("任务取消成功！");
+                        window.location.href = "/RequestFormTasks/FinishIndex/";
+                    }
+                })
+            }
+
+        }
+    }
+
+    //查询
+    function Search() {
+        //得到用户输入的参数，取值有几种方式：$("#id").combobox('getValue'), $("#id").datebox('getValue'), $("#id").val()
+        //字段增加WHC_前缀字符，避免传递如URL这样的Request关键字冲突
+        var queryData = {
+            RequestFormName: $("#RequestFormName").val()
+        }
+        //将值传递给
+        InitGrid(queryData);
+        return false;
+    }
+
+    //初始化查询数据
+    function InitGrid(queryData) {
+        $("#dg").datagrid({
+            title: '需求任务信息列表',
+            url: '/RequestFormTasks/GetRequestFormTaskFinishList',
+            queryParams: queryData,
+            columns: [[
+                { field: 'ID', title: '需求任务编号', width: 100, align: 'center' },
+                { field: 'RequestFormID', title: '需求申请单号', width: 150, align: 'center' },
+                { field: 'RequestFormName', title: '需求名称', width: 150, align: 'center' },
+                { field: 'Assigner', title: '任务指派人', width: 150, align: 'center' },
+                { field: 'ItRoleName', title: 'IT角色', width: 150, align: 'center' },
+                { field: 'Handler', title: '处理人', width: 150, align: 'center' },
+                { field: 'FromDate', title: '任务开始日期',formatter: function (value, row, index) {
+                          return new Date(parseInt(value.substr(6, 13))).toLocaleDateString();
+                      }, width: 150, align: 'center' },
+                { field: 'ToDate', title: '任务结束日期',formatter: function (value, row, index) {
+                          return new Date(parseInt(value.substr(6, 13))).toLocaleDateString();
+                      }, width: 150, align: 'center' },
+                { field: 'PercentOfRequest', title: '需求占比', width: 150, align: 'center' },
+                { field: 'Discription', title: '任务描述', width: 150, align: 'center' },
+                { field: 'TaskStatusName', title: '任务状态', width: 150, align: 'center' },
+                 { field: 'StatusName', title: '状态', width: 60, align: 'center' },
+                 {
+                     field: 'CreateDate', title: '创建时间', width: 100, formatter: function (value, row, index) {
+                         return new Date(parseInt(value.substr(6, 13))).toLocaleDateString();
+                     }, align: 'center'
+                 },
+                 { field: 'CreatePersonName', title: '创建人', width: 100, align: 'center' },
+                  {
+                      field: 'UpdateDate', title: '修改时间', width: 100, formatter: function (value, row, index) {
+                          return new Date(parseInt(value.substr(6, 13))).toLocaleDateString();
+                      }, align: 'center'
+                  },
+                  { field: 'UpdatePersonName', title: '修改人', width: 100, align: 'center' },
+                   { field: 'Summary', title: '备注', width: 100, align: 'center' }
+            ]],
+            toolbar: '#dg-button',
+            singleSelect: true,
+            pagination: true,
+            pageSize: 10,
+            pageList: [10, 20, 30],
+            method: 'get'
+        });
+    }
+
+    //日期格式转换
+    function GetDateFormat(str) {
+        return new Date(parseInt(str.substr(6, 13))).toLocaleDateString();
+    }
+
+</script>
+
+
+
+

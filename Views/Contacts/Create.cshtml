@@ -1,0 +1,237 @@
+﻿@model GyIMS.Models.Contact
+
+
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="UTF-8">
+    <title>联系人信息新增</title>
+</head>
+
+<body>
+    <div style="margin:20px 0;"></div>
+
+    <div class="easyui-panel" title="联系人信息-新增" style="width:100%;height:100%">
+        <div>
+            <form id="contactCreate" method="post" style="width:100%;height:100%">
+                <table style="width:100%;height:100%" cellpadding="10" cellspacing="50">
+                    <tr>
+                        <th width="20%"></th>
+                        <th width="30%"></th>
+                        <th width="20%"></th>
+                        <th width="30%"></th>
+                    </tr>
+                    <tr>
+                        <td align="center">联系人编号:</td>
+                        <td>
+                            <input class="easyui-textbox" type="text" name="ID"
+                                   data-options="required:true" readonly="readonly" style="width:300px" />
+                        </td>
+                        <td align="center">联系人名称:</td>
+                        <td>
+                            <input class="easyui-textbox" type="text" name="Name"
+                                   data-options="required:true" style="width:300px" />
+                        </td>
+                    </tr>
+                    <tr>
+                        <td align="center">编码:</td>
+                        <td>
+                            <input class="easyui-textbox" type="text" name="Code"
+                                   data-options="required:true" style="width:300px" />
+                        </td>
+                    </tr>
+                    <tr>
+                        <td align="center">固定电话:</td>
+                        <td>
+                            <input class="easyui-textbox" type="text" name="Tel" style="width:300px" />
+                        </td>
+                        <td align="center">手机:</td>
+                        <td>
+                            <input class="easyui-textbox" type="text" name="Mobile" data-options="required:true" style="width:300px" />
+                        </td>
+                    </tr>
+                    <tr>
+                        <td align="center">电子邮箱:</td>
+                        <td>
+                            <input class="easyui-textbox" type="text" name="Email" style="width:300px" />
+                        </td>
+                        <td align="center">传真:</td>
+                        <td>
+                            <input class="easyui-textbox" type="text" name="Fax" style="width:300px" />
+                        </td>
+                    </tr>
+                    <tr>
+                        <td align="center">邮政编码:</td>
+                        <td>
+                            <input class="easyui-textbox" type="text" name="PostCode" style="width:300px" />
+                        </td>
+                        <td align="center">状态:</td>
+                        <td>
+                            <select class="easyui-combobox" name="Status" id="Status" data-options="required:true" style="width:300px" />
+                        </td>
+                    </tr>
+                    <tr>
+                        <td align="center">地址:</td>
+                        <td colspan="3">
+                            <input class="easyui-textbox" type="text" data-options="required:true" name="Address" style="width:875px" />
+                        </td>
+                    </tr>
+                    <tr>
+                        <td align="center">创建时间:</td>
+                        <td>
+                            <input class="easyui-textbox" type="text" name="CreateDate" data-options="required:true" readonly="readonly" style="width:300px" />
+                        </td>
+                        <td align="center">创建人:</td>
+                        <td>
+                            <input class="easyui-textbox" type="text" name="CreatePerson" data-options="required:true"  style="width:300px" />
+                        </td>
+                    </tr>
+                    <tr>
+                        <td align="center">修改时间:</td>
+                        <td>
+                            <input class="easyui-textbox" type="text" name="UpdateDate" data-options="required:true" readonly="readonly" style="width:300px" />
+                        </td>
+                        <td align="center">修改人:</td>
+                        <td>
+                            <input class="easyui-textbox" type="text" name="UpdatePerson" data-options="required:true"  style="width:300px" />
+                        </td>
+                    </tr>
+                    <tr style="margin-top:100px">
+                        <td align="center">备注:</td>
+                        <td colspan="3">
+                            <input class="easyui-textbox" name="Summary" data-options="multiline:true"
+                                   style="height:60px;width:875px" />
+                        </td>
+                    </tr>
+                </table>
+            </form>
+            <div style="text-align:center;padding:5px;margin-top:50px">
+                <a href="javascript:void(0)" class="easyui-linkbutton" onclick="submitForm()">提交</a>
+                <a href="/Contacts/Index" class="easyui-linkbutton">返回</a>
+            </div>
+        </div>
+    </div>
+
+    @*Js脚本*@
+<script type="text/javascript">
+    $(function () {
+
+        //新增初始化数据
+        $('#contactCreate').form('load', {
+            ID: '@Model.ID',
+            CreateDate: '@Model.CreateDate',
+            CreatePerson: '@HttpContext.Current.Session["UserID"]',
+            UpdateDate: '@Model.CreateDate',
+            UpdatePerson: '@HttpContext.Current.Session["UserID"]'
+        });
+        $('#Status').combobox({
+            url: '/Contacts/GetContactStatus',
+            textField: 'text',
+            valueField: 'id',
+            panelHeight: 'auto',
+            data: {},
+            method: 'get',
+            onLoadSuccess: function () {
+                var id;
+                if ('@Model.Status' == 'Disabled') {
+                    id = 0;
+                }
+                else if ('@Model.Status' == 'Able') {
+                    id = 1;
+                }
+                $('#Status').combobox('setValue', id);
+            }
+        });
+    });
+
+
+        //新增提交
+    function submitForm() {
+        if ($("[name='Name']").val() == "") {
+            alert("联系人名称不能为空");           
+            return false;
+        }
+
+        if ($("[name='Code']").val() == "") {
+            alert("编码不能为空");
+            return false;
+        }
+
+
+        if ($("[name='Tel']").val() == "" ) {
+            alert("固定电话不能为空");
+            return false;
+        }
+
+
+        if (!verifyTel($("[name='Tel']").val())) {
+            alert("固定电话格式不正确");
+            return false;
+        }
+
+        if ($("[name='Mobile']").val() == "") {
+            alert("手机不能为空");
+            return false;
+        }
+
+        if (!verifyMobilePhone($("[name='Mobile']").val())) {
+            alert("手机号格式不正确");
+            return false;
+        }
+
+        if ($("[name='Email']").val() == "") {
+            alert("电子邮箱不能为空");
+            return false;
+        }
+
+        if (!verifyMail($("[name='Email']").val())) {
+            alert("电子邮箱格式不正确");
+            return false;
+        }
+
+
+
+        $('#contactCreate').form('submit', {
+            url: '/Contacts/CreateByForm/',
+            dataType: "json",
+            onSubmit: function (param) {
+                param.ID = $('#ID').val();
+                param.Name = $('#Name').val();
+                param.Code = $('#Code').val();
+                param.Tel = $('#Tel').val();
+                param.Mobile = $('#Mobile').val();
+                param.Fax = $('#Fax').val();
+                param.Email = $('#Email').val();
+                param.PostCode = $('#PostCode').val();
+                param.Address = $('#Address').val();
+                param.Status = $('#Status').val();
+                param.CreateDate = $('#CreateDate').val();
+                param.CreatePerson = $('#CreatePerson').val();
+                param.UpdateDate = $('#UpdateDate').val();
+                param.UpdatePerson = $('#UpdatePerson').val();
+                param.Summary = $('#Summary').val();
+
+            },
+            success: function (data) {
+                data = JSON.parse(data);
+                alert(data.Message);
+                if (data.Code == 1) {
+                    window.location.href = "@Url.Action("Index", "Contacts")";
+                }
+            }
+        });
+    }
+
+
+    
+
+
+
+</script>
+
+</body>
+
+
+</html>
+

@@ -1,0 +1,93 @@
+﻿@model GyIMS.Models.MenuTitle
+@{
+    ViewBag.Title = "系统菜单标题设定";
+}
+@*界面主体*@
+<div>
+
+    <div id="dg-search" margin="0,30,0,30">
+        <label for="Name">系统菜单标题名称：</label>
+        <input id="TitleName" class="easyui-validatebox" data-options="width:200" />
+    </div>
+
+    <table id="dg"></table>
+    <div id="dg-button">
+        <a class="easyui-linkbutton" data-options="iconCls:'icon-search'" onclick="Search()">查询</a>
+        <a href="#" class="easyui-linkbutton" data-options="iconCls:'icon-reload'" onclick="Reload()">刷新</a>
+        <a href="/MenuTitle/Create" class="easyui-linkbutton" data-options="iconCls:'icon-add'">添加</a>
+        <a href="javascript:void(0)" class="easyui-linkbutton" data-options="iconCls:'icon-edit' " onclick="Edit()">修改</a>
+    </div>
+
+</div>
+
+@*脚本*@
+<script>
+    var GridID = $("#dg");
+
+    $(function () {
+        Search();
+    })
+
+    function Search() {
+        console.log(TitleName);
+        InitGrid({ TitleName: $('#TitleName').val() });
+        return false;
+    }
+
+    function InitGrid(queryData) {
+        GridID.datagrid({
+            title: '系统菜单标题列表',
+            url: '/MenuTitle/GetMenuTitleList',
+            queryParams: queryData,
+            columns: [[
+                 { field: 'ID', title: '系统菜单标题编号', width: 150, align: 'center' },
+                 { field: 'TitleName', title: '系统菜单标题', width: 150, align: 'center' },
+                 { field: 'SN', title: '序号', width: 100, align: 'center' },
+                 { field: 'Rank', title: '等级', width: 100, align: 'center', formatter: getstatusnobyid },
+                 { field: 'LoginUrl', title: '控制器/视图', width: 150, align: 'center'},
+                 { field: 'Status', title: '状态', width: 100, align: 'center', formatter: getstatusnobyid },
+                 { field: 'operate', title: '操作', width: 250, align: 'center', formatter: operate_formatter }
+            ]],
+            toolbar: '#dg-button',
+            singleSelect: true,
+            pagination: true,
+            pageSize: 10,
+            pageList: [10, 20, 30],
+            method: 'get'
+        });
+    }
+
+    function Reload() {
+        $('#TitleName').val("");
+        InitGrid("");
+    }
+
+    function Edit() {
+        var row = $('#dg').datagrid('getSelected');
+        if (row == null) {
+            alert("需要先选择要修改的数据！")
+        }
+        else {
+            window.location.href = "/MenuTitle/Edit/" + row.ID;
+        }
+    };
+
+    function Addmenu() { 
+
+        var row = $('#dg').datagrid('getSelected');
+        if (row == null) {
+            alert("需要先选择要修改的数据！")
+        }
+        else {
+            //alert(row.ID);
+            window.location.href = "/MenuTitle/CreateMenu?mainID=" + row.ID + '&maintitlename=' + encodeURI(encodeURI(row.TitleName));
+        }
+
+    }
+
+    function operate_formatter() {
+        return "<a href='javascript:void(0)' onclick='Edit()' class='easyui-linkbutton'>修改</a>/\
+                <a href='javascript:void(0)' onclick='Addmenu()' class='easyui-linkbutton'>系统菜单设定</a>";
+    }
+</script>
+

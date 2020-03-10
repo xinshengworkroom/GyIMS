@@ -1,0 +1,170 @@
+﻿@model IEnumerable<GyIMS.Models.Menu>
+
+
+@{
+    ViewBag.Title = "系统菜单";
+}
+
+@*界面主体*@
+<div>
+
+
+    <div id="dg-search" margin="0,30,0,30">
+        <label for="Name">系统菜单名称：</label>
+        <input id="Name" class="easyui-validatebox" data-options="width:200" />
+    </div>
+
+    <table id="dg"></table>
+
+    <div id="dg-button">
+        <a class="easyui-linkbutton" data-options="iconCls:'icon-search'" onclick="Search()">查询</a>
+        <a href="#" class="easyui-linkbutton" data-options="iconCls:'icon-reload'" onclick="Reload()">刷新</a>
+        <a href="/Menus/Create" class="easyui-linkbutton" data-options="iconCls:'icon-add'">添加</a>
+        <a href="javascript:void(0)" class="easyui-linkbutton" data-options="iconCls:'icon-edit' " onclick="Edit()">修改</a>
+        <a href="javascript:void(0)" class="easyui-linkbutton" data-options="iconCls:'icon-remove'" onclick="Delete()">删除</a>
+        @*<a href="#" class="easyui-linkbutton" data-options="iconCls:'icon-blank'" onclick="Export()">导出</a>*@
+    </div>
+
+</div>
+
+@*脚本*@
+<script>
+
+        $(function () {
+            $("#dg").datagrid({
+                title: '系统菜单列表',
+                url: '/Menus/GetMenuList',
+                queryParams: "",
+                columns: [[
+                    { field: 'ID', title: '菜单编号', width: 100, align: 'center' },
+                    { field: 'Rank', title: '菜单层级', width: 100, align: 'center', formatter:  getstatusnobyid },
+                     { field: 'Name', title: '菜单名称', width: 150, align: 'center' },
+                     { field: 'ChineseName', title: '中文名称', width: 150, align: 'center' },
+                     { field: 'EnglishName', title: '英文名称', width: 150, align: 'center' },
+                     { field: 'Url', title: '菜单URL', width: 150, align: 'center' },
+                     { field: 'ControllerName', title: '控制器名称', width: 150, align: 'center' },
+                     { field: 'ActionName', title: '功能名称', width: 150, align: 'center' },
+                     { field: 'StatusName', title: '状态', width: 100, align: 'center' },
+                     {
+                         field: 'CreateDate', title: '创建时间', width: 100, formatter: function (value, row, index) {
+                             return new Date(parseInt(value.substr(6, 13))).toLocaleDateString();
+                         }, align: 'center'
+                     },
+                     { field: 'CreatePerson', title: '创建人', width: 100, align: 'center' },
+                      {
+                          field: 'UpdateDate', title: '修改时间', width: 100, formatter: function (value, row, index) {
+                              return new Date(parseInt(value.substr(6, 13))).toLocaleDateString();
+                          }, align: 'center'
+                      },
+                      { field: 'UpdatePerson', title: '修改人', width: 100, align: 'center' },
+                       { field: 'Summary', title: '备注', width: 100, align: 'center' }
+                ]],
+                toolbar: '#dg-button',
+                singleSelect: true,
+                pagination: true,
+                pageSize: 10,
+                pageList: [10, 20, 30],
+                method: 'get'
+            });
+        })
+
+
+        function Reload() {
+            $('#Name').val("");
+            InitGrid("");
+        }
+
+        function Edit() {
+            var row = $('#dg').datagrid('getSelected');
+            if (row == null) {
+                alert("需要先选择要修改的数据！")
+            }
+            else {
+                window.location.href = "/Menus/Edit/" + row.ID;
+            }
+
+        };
+
+        function Delete() {
+            var row = $('#dg').datagrid('getSelected');
+            if (row == null) {
+                alert("需要先选择要删除的数据！")
+            }
+            else {
+                if (confirm("你确定要删除该系统菜单吗？")) {
+                    $.ajax({
+                        url: '/Menus/DeleteByAjax',//地址
+                        dataType: 'text',//返回数据类型
+                        type: 'POST',//类型
+                        data: { id: row.ID },
+                        //请求成功
+                        success: function () {
+                            alert("删除数据成功！");
+                            window.location.href = "/Menus/Index/";
+                        }
+                    })
+                }
+
+            }
+        }
+
+        //$('#dg').datagrid('toExcel', '系统菜单列表.xls');
+
+
+        function Search() {
+            //得到用户输入的参数，取值有几种方式：$("#id").combobox('getValue'), $("#id").datebox('getValue'), $("#id").val()
+            //字段增加WHC_前缀字符，避免传递如URL这样的Request关键字冲突
+            var queryData = {
+                Name: $("#Name").val()
+            }
+            //将值传递给
+            InitGrid(queryData);
+            return false;
+        }
+
+
+        function InitGrid(queryData) {
+            $("#dg").datagrid({
+                title: '系统菜单列表',
+                url: '/Menus/GetMenuList',
+                queryParams: queryData,
+                columns: [[
+                     { field: 'ID', title: '菜单编号', width: 100, align: 'center' },
+                     { field: 'Rank', title: '菜单层级', width: 100, align: 'center' },
+                     { field: 'Name', title: '菜单名称', width: 150, align: 'center' },
+                     { field: 'ChineseName', title: '中文名称', width: 150, align: 'center' },
+                     { field: 'EnglishName', title: '英文名称', width: 150, align: 'center' },
+                     { field: 'Url', title: '菜单URL', width: 150, align: 'center' },
+                     { field: 'ControllerName', title: '控制器名称', width: 150, align: 'center' },
+                     { field: 'ActionName', title: '功能名称', width: 150, align: 'center' },
+                     { field: 'StatusName', title: '状态', width: 100, align: 'center' },
+                     {
+                         field: 'CreateDate', title: '创建时间', width: 100, formatter: function (value, row, index) {
+                             return new Date(parseInt(value.substr(6, 13))).toLocaleDateString();
+                         }, align: 'center'
+                     },
+                     { field: 'CreatePerson', title: '创建人', width: 100, align: 'center' },
+                      {
+                          field: 'UpdateDate', title: '修改时间', width: 100, formatter: function (value, row, index) {
+                              return new Date(parseInt(value.substr(6, 13))).toLocaleDateString();
+                          }, align: 'center'
+                      },
+                      { field: 'UpdatePerson', title: '修改人', width: 100, align: 'center' },
+                       { field: 'Summary', title: '备注', width: 100, align: 'center' }
+                ]],
+                toolbar: '#dg-button',
+                singleSelect: true,
+                pagination: true,
+                pageSize: 10,
+                pageList: [10, 20, 30],
+                method: 'get'
+            });
+        }
+
+
+        function GetDateFormat(str) {
+            return new Date(parseInt(str.substr(6, 13))).toLocaleDateString();
+        }
+
+</script>
+

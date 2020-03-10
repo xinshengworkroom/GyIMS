@@ -1,0 +1,182 @@
+﻿@model IEnumerable<GyIMS.Models.RequestFormAssessment> 
+
+
+@{
+    ViewBag.Title = "需求评估信息";
+}
+
+@*界面主体*@
+<div>
+
+    <div id="dg-search" margin="0,30,0,30">
+        <label for="RequestFormName">需求名称：</label>
+        <input id="RequestFormName" class="easyui-validatebox" data-options="width:200" />
+    </div>
+
+    <table id="dg"></table>
+
+    <div id="dg-button">
+        <a class="easyui-linkbutton" data-options="iconCls:'icon-search'" onclick="Search()">查询</a>
+        <a href="#" class="easyui-linkbutton" data-options="iconCls:'icon-reload'" onclick="Reload()">刷新</a>
+        <a href="javascript:void(0)" class="easyui-linkbutton" data-options="iconCls:'icon-edit' " onclick="Edit()">评估</a>
+        @*<a href="#" class="easyui-linkbutton" data-options="iconCls:'icon-blank'" onclick="Export()">导出</a>*@
+    </div>
+
+</div>
+
+@*脚本*@
+<script>
+
+    $(function () {
+        $("#dg").datagrid({
+            title: '需求评估信息列表',
+            url: '/RequestFormAssessments/GetRequestFormAssessmentList',
+            queryParams: "",
+            columns: [[
+                { field: 'RequestFormID', title: '需求申请单号', width: 150, align: 'center' },
+                { field: 'Assessor', title: '评估人', width: 150, align: 'center' },
+                { field: 'Offerer', title: '报价人', width: 150, align: 'center' },
+                { field: 'ItRoleName', title: 'IT角色', width: 150, align: 'center' },
+                { field: 'WorkType', title: '工作类型', width: 150, align: 'center', formatter: getstatusnobyid },
+                { field: 'TimeUnit', title: '时间单位', width: 150, align: 'center', formatter: getstatusnobyid },
+                { field: 'SpendTime', title: '工期', width: 150, align: 'center' },
+                { field: 'RequestStatus', title: '需求状态', width: 150, align: 'center', formatter: getstatusnobyid },
+                { field: 'StatusName', title: '状态', width: 60, align: 'center' },
+                { field: 'CreateDate', title: '创建时间', width: 100, formatter: getdate, align: 'center' },
+                { field: 'CreatePerson', title: '创建人', width: 100, align: 'center' },
+                { field: 'UpdateDate', title: '修改时间', width: 100, formatter: getdate, align: 'center' },
+                { field: 'UpdatePerson', title: '修改人', width: 100, align: 'center' },
+                { field: 'Summary', title: '备注', width: 100, align: 'center' }
+            ]],
+            toolbar: '#dg-button',
+            singleSelect: true,
+            pagination: true,
+            pageSize: 10,
+            pageList: [10, 20, 30],
+            method: 'get'
+        });
+    })
+
+    //刷新
+    function Reload() {
+        $('#RequestFormName').val("");
+        InitGrid("");
+    }
+
+    //修改
+    function Edit() {
+        var row = $('#dg').datagrid('getSelected');
+        if (row == null) {
+            alert("需要先选择要评估的数据！")
+        }
+        else {
+            window.location.href = "/RequestFormAssessments/Edit/" + row.ID;
+        }
+
+    };
+
+    //删除
+    function Delete() {
+        var row = $('#dg').datagrid('getSelected');
+        if (row == null) {
+            alert("需要先选择要删除的数据！")
+        }
+        else {
+            if (confirm("你确定要删除该需求评估信息吗？")) {
+                $.ajax({
+                    url: '/RequestFormAssessments/DeleteByAjax',//地址
+                    dataType: 'text',//返回数据类型
+                    type: 'POST',//类型
+                    data: { id: row.ID },
+                    //请求成功
+                    success: function () {
+                        alert("删除数据成功！");
+                        window.location.href = "/RequestFormAssessments/Index/";
+                    }
+                })
+            }
+
+        }
+    }
+
+    //查询
+    function Search() {
+        //得到用户输入的参数，取值有几种方式：$("#id").combobox('getValue'), $("#id").datebox('getValue'), $("#id").val()
+        //字段增加WHC_前缀字符，避免传递如URL这样的Request关键字冲突
+        var queryData = {
+            RequestFormName: $("#RequestFormName").val()
+        }
+        //将值传递给
+        InitGrid(queryData);
+        return false;
+    }
+
+    var GetTableName = "RequestForms";
+    var dg = $('#dg');
+    var Datajson = new Object();
+    //报价
+    function Price() {
+        var row = dg.datagrid('getSelected');
+        if (row != null) {
+
+            if (confirm("你确定要报价该需求申请单信息吗？")) {
+
+                StatusJson.TableName = "RequestForms";
+                StatusJson.StatusDesc = "RequestSts";
+                StatusJson.StatusNo = "已报价";
+                GetTabStatusID(StatusJson);
+
+                Datajson.ID = row.ID;
+                Datajson.RequestStatus = GetStausID;
+                $.ajax({
+                    url: '/RequestFormAssessments/PriceByAjax',//地址
+                    dataType: 'json',//返回数据类型
+                    type: 'POST',//类型
+                    data: Datajson ,
+                    //请求成功
+                    success: function () {
+                        alert("报价数据成功！");
+                        window.location.href = "/RequestFormAssessments/Index/";
+                    }
+                })
+
+            } return;
+        }
+       alert("需要先选择要报价的数据！")
+    }
+
+    //初始化查询数据
+    function InitGrid(queryData) {
+        $("#dg").datagrid({
+            title: '需求评估信息列表',
+            url: '/RequestFormAssessments/GetRequestFormAssessmentList',
+            queryParams: queryData,
+            columns: [[
+                { field: 'RequestFormID', title: '需求申请单号', width: 150, align: 'center' },
+                { field: 'Assessor', title: '评估人', width: 150, align: 'center' },
+                { field: 'Offerer', title: '报价人', width: 150, align: 'center' },
+                { field: 'ItRoleName', title: 'IT角色', width: 150, align: 'center' },
+                { field: 'WorkType', title: '工作类型', width: 150, align: 'center', formatter: getstatusnobyid },
+                { field: 'TimeUnit', title: '时间单位', width: 150, align: 'center', formatter: getstatusnobyid },
+                { field: 'SpendTime', title: '工期', width: 150, align: 'center' },
+                { field: 'StatusName', title: '状态', width: 60, align: 'center' },
+                { field: 'CreateDate', title: '创建时间', width: 100, formatter: getdate, align: 'center' },
+                { field: 'CreatePerson', title: '创建人', width: 100, align: 'center' },
+                { field: 'UpdateDate', title: '修改时间', width: 100, formatter: getdate, align: 'center' },
+                { field: 'UpdatePerson', title: '修改人', width: 100, align: 'center' },
+                { field: 'Summary', title: '备注', width: 100, align: 'center' }
+            ]],
+            toolbar: '#dg-button',
+            singleSelect: true,
+            pagination: true,
+            pageSize: 10,
+            pageList: [10, 20, 30],
+            method: 'get'
+        });
+    }
+
+    
+
+</script>
+
+

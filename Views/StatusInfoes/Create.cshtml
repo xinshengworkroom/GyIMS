@@ -1,0 +1,139 @@
+﻿@model GyIMS.Models.StatusInfo
+
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="UTF-8">
+    <title>状态表数据新增</title>
+</head>
+
+<body>
+    <div style="margin:20px 0;"></div>
+
+    <div class="easyui-panel" title="状态信息新增" style="width:100%;height:100%">
+        <div>
+            <form id="StausInfoCreate" method="post" style="width:100%;height:100%">
+                <table style="width:100%;height:100%" cellpadding="10" cellspacing="50">
+                    <tr>
+                        <th width="20%"></th>
+                        <th width="30%"></th>
+                        <th width="20%"></th>
+                        <th width="30%"></th>
+                    </tr>
+                    <tr>
+                        <td align="center">ID:</td>
+                        <td>
+                            <input class="easyui-textbox" type="text" name="ID"
+                                   data-options="required:true" readonly="readonly" style="width:300px" />
+                        </td>
+                        <td align="center">表名:</td>
+                        <td>
+                            <input class="easyui-textbox" type="text" name="TableName"
+                                   data-options="required:true" style="width:300px" />
+                        </td>
+
+                    </tr>
+                    <tr>
+
+                        <td align="center">状态:</td>
+                        <td>
+                            <input class="easyui-textbox" type="text" name="StatusNo"
+                                   data-options="required:true" style="width:300px" />
+                        </td>
+                        <td align="center">状态中文说明:</td>
+                        <td>
+                            <input class="easyui-textbox" type="text" name="StatusNameCH"
+                                  style="width:300px" />
+                        </td>
+                    </tr>
+
+
+                    <tr>
+                        <td align="center">状态描述:</td>
+                        <td>
+                            <input class="easyui-textbox" type="text" name="StatusDesc" style="width:300px" />
+                        </td>
+                    </tr>
+
+                    <tr>
+                        <td align="center">创建时间:</td>
+                        <td>
+                            <input class="easyui-textbox" type="text" name="CreateDate" data-options="required:true" readonly="readonly" style="width:300px" />
+                        </td>
+                        <td align="center">创建人:</td>
+                        <td>
+                            <input class="easyui-textbox" type="text" name="CreateUserId" data-options="required:true" style="width:300px" />
+                        </td>
+                    </tr>
+
+                    <tr>
+                        <td align="center">修改时间:</td>
+                        <td>
+                            <input class="easyui-textbox" type="text" name="UpdateDate" data-options="required:true" readonly="readonly" style="width:300px" />
+                        </td>
+                        <td align="center">修改人:</td>
+                        <td>
+                            <input class="easyui-textbox" type="text" name="UpdateUserId" data-options="required:true" style="width:300px" />
+                        </td>
+                    </tr>
+                </table>
+            </form>
+            <div style="text-align:center;padding:5px;margin-top:50px">
+                <a href="javascript:void(0)" class="easyui-linkbutton" onclick="submitForm()">提交</a>
+                <a href="/Users/Index" class="easyui-linkbutton">返回</a>
+            </div>
+        </div>
+    </div>
+
+
+    @*Js脚本*@
+    <script type="text/javascript">
+        $(function () {
+            //新增初始化数据
+            $('#StausInfoCreate').form('load', {
+                ID: '@Model.ID',
+                CreateDate: '@Model.CreateDate',
+                CreateUserId: '@HttpContext.Current.Session["UserID"]',
+                UpdateDate: '@Model.UpdateDate',
+                UpdateUserId: '@HttpContext.Current.Session["UserID"]'
+            });
+
+        });
+
+
+        //新增提交
+        function submitForm() {
+            $('#StausInfoCreate').form('submit', {
+                url: '/StatusInfoes/CreateByForm/',
+                dataType:'json',
+                onSubmit: function (param) {
+                    param.ID = $('#ID').val();
+                    param.TableName = $('#TableName').val();
+                    param.StatusNo = $('#StatusNo').val();
+                    param.StatusNameCH = $('#StatusNameCH').val();
+                    param.StatusNameEN = $('#StatusNameEN').val();
+                    param.StatusDesc = $('#StatusDesc').val();
+                    param.CreateUserId = $('#CreateUserId').val();
+                    param.UpdateUserId = $('#UpdateUserId').val();
+                    param.CreateDate = $('#CreateDate').val();
+                    param.UpdateDate = $('#UpdateDate').val();
+
+                },
+                success: function (data) {
+                    data = JSON.parse(data);
+                    alert(data.Message);
+                    if (data.Code == 1) {
+                       // window.location.href = "@Url.Action("Index", "StatusInfoes")";
+                    }
+                }
+            });
+        }
+
+
+
+
+
+    </script>
+</body>
+</html>

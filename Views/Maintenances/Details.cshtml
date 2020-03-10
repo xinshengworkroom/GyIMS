@@ -1,0 +1,278 @@
+﻿@model GyIMS.Models.Maintenance
+
+@{
+    ViewBag.Title = "Details";
+    Layout = null;
+}
+<!DOCTYPE html>
+<html>
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>宏宇货运IT管理系统</title>
+    @*引入EasyUI样式文件*@
+    <link href="~/Scripts/jquery-easyui-1.8.8/themes/default/easyui.css" rel="stylesheet" />
+    <link href="~/Scripts/jquery-easyui-1.8.8/themes/icon.css" rel="stylesheet" />
+    @Styles.Render("~/Content/css")
+    @*引入JQuery和EasyUI*@
+    <script src="~/Scripts/JqCombox.js"></script>
+    <script src="~/Scripts/JqCurrency.js"></script>
+    <script src="~/Scripts/jquery-easyui-1.8.8/jquery.min.js"></script>
+    <script src="~/Scripts/jquery-easyui-1.8.8/jquery.easyui.min.js"></script>
+
+    @*引入中文语言包*@
+    <script src="~/Scripts/jquery-easyui-1.8.8/locale/easyui-lang-zh_CN.js"></script>
+
+    @Scripts.Render("~/bundles/modernizr")
+
+</head>
+<body style="text-align:center;">
+    <h2 >Details</h2>
+
+    <div>
+        <h4>Maintenance</h4>
+        <hr />
+        <!--
+        <dl class="dl-horizontal">
+            <dt>
+                @Html.DisplayNameFor(model => model.UserCreate.Code)
+            </dt>
+
+            <dd>
+                @Html.DisplayFor(model => model.UserCreate.Code)
+            </dd>
+
+            <dt>
+                @Html.DisplayNameFor(model => model.UserUpdate.Code)
+            </dt>
+
+            <dd>
+                @Html.DisplayFor(model => model.UserUpdate.Code)
+            </dd>
+
+            <dt>
+                @Html.DisplayNameFor(model => model.Code)
+            </dt>
+
+            <dd>
+                @Html.DisplayFor(model => model.Code)
+            </dd>
+
+            <dt>
+                @Html.DisplayNameFor(model => model.Applier)
+            </dt>
+
+            <dd>
+                @Html.DisplayFor(model => model.Applier)
+            </dd>
+
+            <dt>
+                @Html.DisplayNameFor(model => model.Region)
+            </dt>
+
+            <dd>
+                @Html.DisplayFor(model => model.Region)
+            </dd>
+
+            <dt>
+                @Html.DisplayNameFor(model => model.Type)
+            </dt>
+
+            <dd>
+                @Html.DisplayFor(model => model.Type)
+            </dd>
+
+            <dt>
+                @Html.DisplayNameFor(model => model.SysType)
+            </dt>
+
+            <dd>
+                @Html.DisplayFor(model => model.SysType)
+            </dd>
+
+            <dt>
+                @Html.DisplayNameFor(model => model.HSysType)
+            </dt>
+
+            <dd>
+                @Html.DisplayFor(model => model.HSysType)
+            </dd>
+
+            <dt>
+                @Html.DisplayNameFor(model => model.Name)
+            </dt>
+
+            <dd>
+                @Html.DisplayFor(model => model.Name)
+            </dd>
+
+            <dt>
+                @Html.DisplayNameFor(model => model.Description)
+            </dt>
+
+            <dd>
+                @Html.DisplayFor(model => model.Description)
+            </dd>
+
+            <dt>
+                @Html.DisplayNameFor(model => model.Status)
+            </dt>
+
+            <dd>
+                @Html.DisplayFor(model => model.Status)
+            </dd>
+
+            <dt>
+                @Html.DisplayNameFor(model => model.CreateDate)
+            </dt>
+
+            <dd>
+                @Html.DisplayFor(model => model.CreateDate)
+            </dd>
+
+            <dt>
+                @Html.DisplayNameFor(model => model.UpdateDate)
+            </dt>
+
+            <dd>
+                @Html.DisplayFor(model => model.UpdateDate)
+            </dd>
+
+            <dt>
+                @Html.DisplayNameFor(model => model.Summary)
+            </dt>
+
+            <dd>
+                @Html.DisplayFor(model => model.Summary)
+            </dd>
+
+        </dl>
+        -->
+
+        <table style="width:100%;height:100%" cellpadding="10" cellspacing="50">
+            <tr>
+                <th width="20%"></th>
+                <th width="30%"></th>
+                <th width="20%"></th>
+                <th width="30%"></th>
+            </tr>
+            <tr>
+                <td align="right">运维单号:</td>
+                <td align="left">
+                    @Model.ID
+                </td>
+                <td align="right">单号:</td>
+                <td align="left">
+                    @Model.Code
+                </td>
+
+            </tr>
+            <tr>
+                <td align="right">申请人:</td>
+                <td align="left">
+                    @Model.Applier
+                </td>
+                <td align="right">区域（申请人所在）:</td>
+                <td align="left">
+                    @Model.Region
+
+                </td>
+            </tr>
+            <tr>
+                <td align="right">问题类型:</td>
+                <td align="left">
+                    @Model.Type
+                </td>
+                <td align="right">软件系统类型:</td>
+                <td align="left">
+                    @Model.SysType
+                </td>
+
+            </tr>
+            <tr>
+                <td align="right">硬件系统类型:</td>
+                <td align="left">
+                    @Model.HSysType
+                </td>
+                <td align="right">状态:</td>
+                <td align="left">
+                    @Model.Status
+                </td>
+
+            </tr>
+            <tr>
+                <td align="right">运维状态:</td>
+                <td align="left">
+                    @Model.MaintenanceStatus
+                </td>
+                @*<td align="right">上传文件名称:</td>
+                <td align="left"></td>*@
+            </tr>
+            <tr>
+
+                <td align="right">问题名称:</td>
+                <td align="left">
+                    @Model.Name
+                </td>
+
+            </tr>
+            <tr>
+                <td align="right">创建时间:</td>
+                <td align="left">
+                    @Model.CreateDate
+                </td>
+                <td align="right">创建人:</td>
+                <td align="left">
+                    @Model.CreatePerson
+                </td>
+            </tr>
+            <tr>
+                <td align="right">修改时间:</td>
+                <td align="left">
+                    @Model.UpdateDate
+                </td>
+                <td align="right">修改人:</td>
+                <td align="left">
+                    @Model.UpdatePerson
+                </td>
+            </tr>
+            <tr style="margin-top:100px">
+                <td align="right">问题描述:</td>
+                <td colspan="3" align="left">
+                    @Model.Description
+                </td>
+            </tr>
+            <tr style="margin-top:100px">
+                <td align="right">备注:</td>
+                <td colspan="3" align="left">
+                    @Model.Summary
+                </td>
+            </tr>
+            <tr>
+                <td align="right">相关附件:</td>
+                <td colspan="3" align="left">
+                    <input type="hidden" id="hid_files" value="@Model.FileName" />
+                    <div id="files">
+                        @{
+                            if (!string.IsNullOrEmpty(Model.FileName))
+                            {
+                                string[] files = Model.FileName.Split(',');
+                                foreach (string file in files)
+                                {
+                                    <a target="_blank" title='点击下载该文件' href='@Url.Action("FileDownload", "Maintenances", new { area = "" })?filename=@file'>@file</a><br />
+                                }
+                            }
+                        }
+                    </div>
+                </td>
+            </tr>
+        </table>
+
+    </div>
+    <p>
+        @Html.ActionLink("Edit", "Edit", new { id = Model.ID }) |
+        @Html.ActionLink("Back to List", "Index")
+    </p>
+</body>
+</html>

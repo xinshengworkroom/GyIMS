@@ -1,0 +1,235 @@
+﻿@model GyIMS.Models.Message
+
+
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="UTF-8">
+    <title>新消息-新增</title>
+</head>
+
+<body>
+    <div style="margin:20px 0;"></div>
+
+    <div class="easyui-panel" title="新消息-新增" style="width:100%;height:100%">
+        <div>
+            <form id="Create" method="post" style="width:100%;height:100%">
+                <table style="width:100%;height:100%" cellpadding="10" cellspacing="50">
+                    <tr>
+                        <th width="20%"></th>
+                        <th width="30%"></th>
+                        <th width="20%"></th>
+                        <th width="30%"></th>
+                    </tr>
+                    <tr>
+                        <td align="center">消息编号:</td>
+                        <td>
+                            <input class="easyui-textbox" type="text" name="ID"
+                                   data-options="required:true" readonly="readonly" style="width:300px" />
+                        </td>
+                        <td align="center">业务类型:</td>
+                        <td>
+                            <select class="easyui-combobox" name="BizType" id="BizType" data-options="required:true" style="width:300px" />
+                        </td>
+
+                    </tr>
+                    <tr>
+                        <td align="center">运维业务单号:</td>
+                        <td>
+                            <select class="easyui-combobox" name="BizNo1" id="BizNo1" style="width:300px" />
+
+                        </td>
+                        <td align="center">需求业务单号:</td>
+                        <td>
+                            <select class="easyui-combobox" name="BizNo2" id="BizNo2" style="width:300px" />
+
+                        </td>
+                    </tr>
+                    <tr>
+                        <td align="center">业务简述:</td>
+                        <td>
+                            <input class="easyui-textbox" type="text" name="BizName"
+                                   data-options="required:true" style="width:300px" />
+                        </td>
+                        <td align="center">被通知人:</td>
+                        <td>
+                            <input class="easyui-textbox" type="text" name="NotifyParty"
+                                   data-options="required:true" style="width:300px" />
+                        </td>
+                    </tr>
+                    <tr>
+                        <td align="center">状态:</td>
+                        <td>
+                            <select class="easyui-combobox" name="Status" id="Status" data-options="required:true" style="width:300px" />
+                        </td>
+
+                    </tr>
+                    <tr>
+                        <td align="center">创建时间:</td>
+                        <td>
+                            <input class="easyui-textbox" type="text" name="CreateDate" data-options="required:true" readonly="readonly" style="width:300px" />
+                        </td>
+                        <td align="center">查阅时间:</td>
+                        <td>
+                            <input class="easyui-textbox" data-options="formatter:ww4,sharedCalendar:'#cc'"
+                                   style="width:300px;" id="ConsultDate">
+                        </td>
+                    </tr>
+
+                </table>
+            </form>
+            <div style="text-align:center;padding:5px;margin-top:50px">
+                <a href="javascript:void(0)" class="easyui-linkbutton" onclick="submitForm()">提交</a>
+                <a href="/Messages/Index" class="easyui-linkbutton">返回</a>
+            </div>
+        </div>
+    </div>
+
+    @section scripts{
+        <script type="text/javascript">
+        $(function () {
+            //新增初始化数据
+            $('#Create').form('load', {
+                ID: '@Model.ID',
+                CreateDate: '@Model.CreateDate',
+            });
+
+
+            //状态
+            $('#Status').combobox({
+                url: '/Messages/GetMessageStatus',
+                textField: 'text',
+                valueField: 'id',
+                panelHeight: 'auto',
+                data: {},
+                method: 'get',
+                onLoadSuccess: function () {
+                    var id;
+                    if ('@Model.Status' == 'Disabled') {
+                        id = 0;
+                    }
+                    else if ('@Model.Status' == 'Able') {
+                        id = 1;
+                    }
+                    else {
+                        id = 1;
+                    }
+                    $('#Status').combobox('setValue', id);
+                }
+            });
+            //需求申请单
+            $('#BizNo2').combobox({
+                url: '/Messages/GetRequestForms',
+                textField: 'text',
+                valueField: 'id',
+                panelHeight: 'auto',
+                data: {},
+                method: 'get',
+                onLoadSuccess: function () {
+                    $('#BizNo2').combobox('setValue', '@Model.BizNo2');
+                }
+            });
+
+            //运维单
+            $('#BizNo1').combobox({
+                url: '/Messages/GetMaintenances',
+                textField: 'text',
+                valueField: 'id',
+                panelHeight: 'auto',
+                data: {},
+                method: 'get',
+                onLoadSuccess: function () {
+                    $('#BizNo1').combobox('setValue', '@Model.BizNo1');
+                }
+            });
+
+            //类型
+            $('#BizType').combobox({
+                url: '/Messages/GetBizTypes',
+                textField: 'text',
+                valueField: 'id',
+                panelHeight: 'auto',
+                data: {},
+                method: 'get',
+                onLoadSuccess: function () {
+                    $('#BizType').combobox('setValue', '@Model.BizTypeName');
+                }
+            });
+        });
+
+
+
+
+    //新增提交
+        function submitForm() {
+            if ($('[name="ID"]').val() == "") {
+                alert("消息编号不能为空");
+                $('[name="ID"]').focus();
+                return false;
+            }
+            if ($('#BizType').combobox("getValue") == "") {
+                alert("业务类型不能为空");
+                $('#BizType').focus();
+                return false;
+            }
+            if ($('[name="BizName"]').val() == "") {
+                alert("业务简述不能为空");
+                $('[name="BizName"]').focus();
+                return false;
+            }
+            if ($('[name="NotifyParty"]').val() == "") {
+                alert("被通知人不能为空");
+                $('[name="NotifyParty"]').focus();
+                return false;
+            }
+            if ($('[name="CreateDate"]').val() == "") {
+                alert("创建时间不能为空");
+                $('[name="CreateDate"]').focus();
+                return false;
+            }
+            //if ($('[name="ConsultDate"]').val() == "") {
+            //    alert("查阅时间不能为空");
+            //    $('[name="ConsultDate"]').focus();
+            //    return false;
+            //}
+            $('#Create').form('submit', {
+                url: '/Messages/CreateByForm/',
+                onSubmit: function (param) {
+                    param.ID = $('#ID').val();
+                    param.BizType = $('#BizType').val();
+                    param.BizNo1 = $('#BizNo1').val();
+                    param.BizNo2 = $('#BizNo2').val();
+                    param.BizName = $('#BizName').val();
+                    param.NotifyParty = $('#NotifyParty').val();
+                    param.Status = $('#Status').val();
+                    param.CreateDate = $('#CreateDate').val();
+                    param.ConsultDate = $('#ConsultDate').val();
+
+
+                },
+                success: function (data) {
+                    alert("新消息创建成功！");
+                    window.location.href = "@Url.Action("Index", "Messages")";
+                }
+            });
+        }
+
+        //格式化日期
+        function ww4(date) {
+            var y = date.getFullYear();
+            var m = date.getMonth() + 1;
+            var d = date.getDate()
+            return y + '-' + m + '-' + d;
+        }
+
+
+        </script>
+
+    }
+</body>
+
+
+</html>
+
+

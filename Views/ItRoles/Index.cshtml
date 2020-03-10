@@ -1,0 +1,143 @@
+﻿@model IEnumerable<GyIMS.Models.ItRole>
+
+
+@{
+    ViewBag.Title = "IT角色信息";
+}
+
+@*界面主体*@
+<div>
+
+    <div id="dg-search" margin="0,30,0,30">
+        <label for="Name">IT角色名称：</label>
+        <input id="Name" class="easyui-validatebox" data-options="width:200" />
+    </div>
+
+    <table id="dg"></table>
+
+    <div id="dg-button">
+        <a class="easyui-linkbutton" data-options="iconCls:'icon-search'" onclick="Search()">查询</a>
+        <a href="#" class="easyui-linkbutton" data-options="iconCls:'icon-reload'" onclick="Reload()">刷新</a>
+        <a href="javascript:void(0)" class="easyui-linkbutton" data-options="iconCls:'icon-edit' " onclick="Edit()">修改</a>
+        @*<a href="#" class="easyui-linkbutton" data-options="iconCls:'icon-blank'" onclick="Export()">导出</a>*@
+    </div>
+
+</div>
+
+@*脚本*@
+<script>
+
+        $(function () {
+            $("#dg").datagrid({
+                title: 'IT角色信息列表',
+                url: '/ITRoles/GetItRoleList',
+                queryParams: "",
+                columns: [[
+                     { field: 'ID', title: '角色编号', width: 100, align: 'center' },
+                     { field: 'Name', title: '角色名称', width: 150, align: 'center' },
+                     { field: 'DayCost', title: '按天成本（每人每天单价）', width: 200, align: 'center' },
+                     { field: 'HourCost', title: '按时成本（每人每小时单价）', width: 200, align: 'center' },
+                     
+                     { field: 'MinuteCost', title: '按分成本（每人每分单价）', width: 200, align: 'center' },
+                      
+                      { field: 'NumCost', title: '按次计费价格', width: 150, align: 'center' },
+                       { field: 'StatusName', title: '状态', width: 80, align: 'center' }
+                ]],
+                toolbar: '#dg-button',
+                singleSelect: true,
+                pagination: true,
+                pageSize: 10,
+                pageList: [10, 20, 30],
+                method: 'get'
+            });
+        })
+
+        //刷新
+        function Reload() {
+            $('#Name').val("");
+            InitGrid("");
+        }
+
+        //修改
+        function Edit() {
+            var row = $('#dg').datagrid('getSelected');
+            if (row == null) {
+                alert("需要先选择要修改的数据！")
+            }
+            else {
+                window.location.href = "/ItRoles/Edit/" + row.ID;
+            }
+
+        };
+
+        
+
+        //删除
+        function Delete() {
+            var row = $('#dg').datagrid('getSelected');
+            if (row == null) {
+                alert("需要先选择要删除的数据！")
+            }
+            else {
+                if (confirm("你确定要删除该角色信息吗？")) {
+                    $.ajax({
+                        url: '/ItRoles/DeleteByAjax',//地址
+                        dataType: 'text',//返回数据类型
+                        type: 'POST',//类型
+                        data: { id: row.ID },
+                        //请求成功
+                        success: function () {
+                            alert("删除数据成功！");
+                            window.location.href = "/ItRoles/Index/";
+                        }
+                    })
+                }
+
+            }
+        }
+
+        //查询
+        function Search() {
+            //得到用户输入的参数，取值有几种方式：$("#id").combobox('getValue'), $("#id").datebox('getValue'), $("#id").val()
+            //字段增加WHC_前缀字符，避免传递如URL这样的Request关键字冲突
+            var queryData = {
+                Name: $("#Name").val()
+            }
+            //将值传递给
+            InitGrid(queryData);
+            return false;
+        }
+
+        //初始化查询数据
+        function InitGrid(queryData) {
+            $("#dg").datagrid({
+                title: 'IT角色信息列表',
+                url: '/ItRoles/GetItRoleList',
+                queryParams: queryData,
+                columns: [[
+                     { field: 'ID', title: '角色编号', width: 100, align: 'center' },
+                     { field: 'Name', title: '角色名称', width: 150, align: 'center' },
+                     { field: 'DayCost', title: '按天成本（每人每天单价）', width: 200, align: 'center' },
+                     { field: 'HourCost', title: '按时成本（每人每小时单价）', width: 200, align: 'center' },
+                     
+                     { field: 'MinuteCost', title: '按分成本（每人每分单价）', width: 200, align: 'center' },
+                      
+                      { field: 'NumCost', title: '按次计费价格', width: 150, align: 'center' },
+                       { field: 'StatusName', title: '状态', width: 80, align: 'center' }
+                ]],
+                toolbar: '#dg-button',
+                singleSelect: true,
+                pagination: true,
+                pageSize: 10,
+                pageList: [10, 20, 30],
+                method: 'get'
+            });
+        }
+
+        //日期格式转换
+        function GetDateFormat(str) {
+            return new Date(parseInt(str.substr(6, 13))).toLocaleDateString();
+        }
+
+</script>
+
